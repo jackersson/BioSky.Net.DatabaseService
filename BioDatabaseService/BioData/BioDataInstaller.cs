@@ -23,7 +23,8 @@ namespace BioData
                .ImplementedBy<BioConnectionBuilder>()
                .DependsOn(new
                {
-                   dbConnectionstring = @"D:\BioDatabaseService\database\BioSkyNet.mdf"
+                   dbConnectionstring = @"F:\Biometric Software\BioSky.Net.DatabaseService\BioDatabaseService\database\BioSkyNet.mdf"
+                   //dbConnectionstring = @"D:\BioDatabaseService\database\BioSkyNet.mdf"
                })
                  .LifestyleSingleton()
                );
