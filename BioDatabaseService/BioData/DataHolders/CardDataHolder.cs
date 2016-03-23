@@ -19,6 +19,7 @@ namespace BioData.DataHolders
 
     public BioService.Card UpdateFromProto(BioService.Card proto)
     {
+      /*
       Card entity = _convertor.GetCardEntity(proto);
 
       if (entity == null)
@@ -65,7 +66,7 @@ namespace BioData.DataHolders
                  };                
         }                
       }
-
+      */
       return proto;      
     }
 

@@ -19,6 +19,7 @@ namespace BioData.DataHolders
 
     public BioService.AccessDevice UpdateFromProto(BioService.AccessDevice proto)
     {
+      /*
       AccessDevice entity = _convertor.GetAccessDeviceEntity(proto);
 
       if (entity == null)
@@ -63,7 +64,7 @@ namespace BioData.DataHolders
                  , EntityState = entityState };                
         }                
       }
-
+      */
       return proto;      
     }
 

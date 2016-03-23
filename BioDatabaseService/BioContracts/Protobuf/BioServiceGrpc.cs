@@ -135,72 +135,140 @@ namespace BioService {
   {
     static readonly string __ServiceName = "BioService.BiometricDatabaseSevice";
 
-    static readonly Marshaller<global::BioService.SocketConfiguration> __Marshaller_SocketConfiguration = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.SocketConfiguration.Parser.ParseFrom);
-    static readonly Marshaller<global::BioService.Response> __Marshaller_Response = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.Response.Parser.ParseFrom);
-    static readonly Marshaller<global::BioService.CommandPersons> __Marshaller_CommandPersons = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.CommandPersons.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.QueryPersons> __Marshaller_QueryPersons = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.QueryPersons.Parser.ParseFrom);
     static readonly Marshaller<global::BioService.PersonList> __Marshaller_PersonList = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.PersonList.Parser.ParseFrom);
-    static readonly Marshaller<global::BioService.CommandVisitors> __Marshaller_CommandVisitors = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.CommandVisitors.Parser.ParseFrom);
-    static readonly Marshaller<global::BioService.VisitorList> __Marshaller_VisitorList = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.VisitorList.Parser.ParseFrom);
-    static readonly Marshaller<global::BioService.CommandLocations> __Marshaller_CommandLocations = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.CommandLocations.Parser.ParseFrom);
-    static readonly Marshaller<global::BioService.LocationList> __Marshaller_LocationList = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.LocationList.Parser.ParseFrom);
-    static readonly Marshaller<global::BioService.CommandPhoto> __Marshaller_CommandPhoto = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.CommandPhoto.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.Person> __Marshaller_Person = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.Person.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.Photo> __Marshaller_Photo = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.Photo.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.Response> __Marshaller_Response = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.Response.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.Card> __Marshaller_Card = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.Card.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.RawIndexes> __Marshaller_RawIndexes = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.RawIndexes.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.QueryPhoto> __Marshaller_QueryPhoto = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.QueryPhoto.Parser.ParseFrom);
     static readonly Marshaller<global::BioService.PhotoList> __Marshaller_PhotoList = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.PhotoList.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.QueryVisitors> __Marshaller_QueryVisitors = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.QueryVisitors.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.VisitorList> __Marshaller_VisitorList = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.VisitorList.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.Visitor> __Marshaller_Visitor = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.Visitor.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.QueryLocations> __Marshaller_QueryLocations = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.QueryLocations.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.LocationList> __Marshaller_LocationList = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.LocationList.Parser.ParseFrom);
+    static readonly Marshaller<global::BioService.Location> __Marshaller_Location = Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BioService.Location.Parser.ParseFrom);
 
-    static readonly Method<global::BioService.SocketConfiguration, global::BioService.Response> __Method_AddSocket = new Method<global::BioService.SocketConfiguration, global::BioService.Response>(
-        MethodType.Unary,
-        __ServiceName,
-        "AddSocket",
-        __Marshaller_SocketConfiguration,
-        __Marshaller_Response);
-
-    static readonly Method<global::BioService.CommandPersons, global::BioService.PersonList> __Method_PersonSelect = new Method<global::BioService.CommandPersons, global::BioService.PersonList>(
+    static readonly Method<global::BioService.QueryPersons, global::BioService.PersonList> __Method_PersonSelect = new Method<global::BioService.QueryPersons, global::BioService.PersonList>(
         MethodType.Unary,
         __ServiceName,
         "PersonSelect",
-        __Marshaller_CommandPersons,
+        __Marshaller_QueryPersons,
         __Marshaller_PersonList);
 
-    static readonly Method<global::BioService.CommandVisitors, global::BioService.VisitorList> __Method_VisitorSelect = new Method<global::BioService.CommandVisitors, global::BioService.VisitorList>(
+    static readonly Method<global::BioService.Person, global::BioService.Person> __Method_AddPerson = new Method<global::BioService.Person, global::BioService.Person>(
         MethodType.Unary,
         __ServiceName,
-        "VisitorSelect",
-        __Marshaller_CommandVisitors,
-        __Marshaller_VisitorList);
+        "AddPerson",
+        __Marshaller_Person,
+        __Marshaller_Person);
 
-    static readonly Method<global::BioService.CommandLocations, global::BioService.LocationList> __Method_LocationSelect = new Method<global::BioService.CommandLocations, global::BioService.LocationList>(
+    static readonly Method<global::BioService.Person, global::BioService.Person> __Method_UpdatePerson = new Method<global::BioService.Person, global::BioService.Person>(
         MethodType.Unary,
         __ServiceName,
-        "LocationSelect",
-        __Marshaller_CommandLocations,
-        __Marshaller_LocationList);
+        "UpdatePerson",
+        __Marshaller_Person,
+        __Marshaller_Person);
 
-    static readonly Method<global::BioService.CommandPhoto, global::BioService.PhotoList> __Method_PhotoSelect = new Method<global::BioService.CommandPhoto, global::BioService.PhotoList>(
+    static readonly Method<global::BioService.Person, global::BioService.Person> __Method_RemovePerson = new Method<global::BioService.Person, global::BioService.Person>(
         MethodType.Unary,
         __ServiceName,
-        "PhotoSelect",
-        __Marshaller_CommandPhoto,
+        "RemovePerson",
+        __Marshaller_Person,
+        __Marshaller_Person);
+
+    static readonly Method<global::BioService.Photo, global::BioService.Response> __Method_SetThumbnail = new Method<global::BioService.Photo, global::BioService.Response>(
+        MethodType.Unary,
+        __ServiceName,
+        "SetThumbnail",
+        __Marshaller_Photo,
+        __Marshaller_Response);
+
+    static readonly Method<global::BioService.Card, global::BioService.Card> __Method_AddCard = new Method<global::BioService.Card, global::BioService.Card>(
+        MethodType.Unary,
+        __ServiceName,
+        "AddCard",
+        __Marshaller_Card,
+        __Marshaller_Card);
+
+    static readonly Method<global::BioService.RawIndexes, global::BioService.RawIndexes> __Method_RemoveCards = new Method<global::BioService.RawIndexes, global::BioService.RawIndexes>(
+        MethodType.Unary,
+        __ServiceName,
+        "RemoveCards",
+        __Marshaller_RawIndexes,
+        __Marshaller_RawIndexes);
+
+    static readonly Method<global::BioService.QueryPhoto, global::BioService.PhotoList> __Method_SelectPhotos = new Method<global::BioService.QueryPhoto, global::BioService.PhotoList>(
+        MethodType.Unary,
+        __ServiceName,
+        "SelectPhotos",
+        __Marshaller_QueryPhoto,
         __Marshaller_PhotoList);
 
-    static readonly Method<global::BioService.PersonList, global::BioService.PersonList> __Method_PersonUpdate = new Method<global::BioService.PersonList, global::BioService.PersonList>(
+    static readonly Method<global::BioService.Photo, global::BioService.Photo> __Method_AddPhoto = new Method<global::BioService.Photo, global::BioService.Photo>(
         MethodType.Unary,
         __ServiceName,
-        "PersonUpdate",
-        __Marshaller_PersonList,
-        __Marshaller_PersonList);
+        "AddPhoto",
+        __Marshaller_Photo,
+        __Marshaller_Photo);
 
-    static readonly Method<global::BioService.VisitorList, global::BioService.VisitorList> __Method_VisitorUpdate = new Method<global::BioService.VisitorList, global::BioService.VisitorList>(
+    static readonly Method<global::BioService.RawIndexes, global::BioService.RawIndexes> __Method_RemovePhotos = new Method<global::BioService.RawIndexes, global::BioService.RawIndexes>(
         MethodType.Unary,
         __ServiceName,
-        "VisitorUpdate",
-        __Marshaller_VisitorList,
+        "RemovePhotos",
+        __Marshaller_RawIndexes,
+        __Marshaller_RawIndexes);
+
+    static readonly Method<global::BioService.QueryVisitors, global::BioService.VisitorList> __Method_SelectVisitors = new Method<global::BioService.QueryVisitors, global::BioService.VisitorList>(
+        MethodType.Unary,
+        __ServiceName,
+        "SelectVisitors",
+        __Marshaller_QueryVisitors,
         __Marshaller_VisitorList);
 
-    static readonly Method<global::BioService.LocationList, global::BioService.LocationList> __Method_LocationUpdate = new Method<global::BioService.LocationList, global::BioService.LocationList>(
+    static readonly Method<global::BioService.Visitor, global::BioService.Response> __Method_AttachVisitorToPerson = new Method<global::BioService.Visitor, global::BioService.Response>(
         MethodType.Unary,
         __ServiceName,
-        "LocationUpdate",
-        __Marshaller_LocationList,
+        "AttachVisitorToPerson",
+        __Marshaller_Visitor,
+        __Marshaller_Response);
+
+    static readonly Method<global::BioService.RawIndexes, global::BioService.RawIndexes> __Method_RemoveVisitors = new Method<global::BioService.RawIndexes, global::BioService.RawIndexes>(
+        MethodType.Unary,
+        __ServiceName,
+        "RemoveVisitors",
+        __Marshaller_RawIndexes,
+        __Marshaller_RawIndexes);
+
+    static readonly Method<global::BioService.QueryLocations, global::BioService.LocationList> __Method_SelectLocations = new Method<global::BioService.QueryLocations, global::BioService.LocationList>(
+        MethodType.Unary,
+        __ServiceName,
+        "SelectLocations",
+        __Marshaller_QueryLocations,
         __Marshaller_LocationList);
+
+    static readonly Method<global::BioService.Location, global::BioService.Location> __Method_AddLocation = new Method<global::BioService.Location, global::BioService.Location>(
+        MethodType.Unary,
+        __ServiceName,
+        "AddLocation",
+        __Marshaller_Location,
+        __Marshaller_Location);
+
+    static readonly Method<global::BioService.Location, global::BioService.Location> __Method_UpdateLocation = new Method<global::BioService.Location, global::BioService.Location>(
+        MethodType.Unary,
+        __ServiceName,
+        "UpdateLocation",
+        __Marshaller_Location,
+        __Marshaller_Location);
+
+    static readonly Method<global::BioService.RawIndexes, global::BioService.RawIndexes> __Method_RemoveLocations = new Method<global::BioService.RawIndexes, global::BioService.RawIndexes>(
+        MethodType.Unary,
+        __ServiceName,
+        "RemoveLocations",
+        __Marshaller_RawIndexes,
+        __Marshaller_RawIndexes);
 
     // service descriptor
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -211,51 +279,96 @@ namespace BioService {
     // client interface
     public interface IBiometricDatabaseSeviceClient
     {
-      global::BioService.Response AddSocket(global::BioService.SocketConfiguration request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      global::BioService.Response AddSocket(global::BioService.SocketConfiguration request, CallOptions options);
-      AsyncUnaryCall<global::BioService.Response> AddSocketAsync(global::BioService.SocketConfiguration request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      AsyncUnaryCall<global::BioService.Response> AddSocketAsync(global::BioService.SocketConfiguration request, CallOptions options);
-      global::BioService.PersonList PersonSelect(global::BioService.CommandPersons request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      global::BioService.PersonList PersonSelect(global::BioService.CommandPersons request, CallOptions options);
-      AsyncUnaryCall<global::BioService.PersonList> PersonSelectAsync(global::BioService.CommandPersons request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      AsyncUnaryCall<global::BioService.PersonList> PersonSelectAsync(global::BioService.CommandPersons request, CallOptions options);
-      global::BioService.VisitorList VisitorSelect(global::BioService.CommandVisitors request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      global::BioService.VisitorList VisitorSelect(global::BioService.CommandVisitors request, CallOptions options);
-      AsyncUnaryCall<global::BioService.VisitorList> VisitorSelectAsync(global::BioService.CommandVisitors request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      AsyncUnaryCall<global::BioService.VisitorList> VisitorSelectAsync(global::BioService.CommandVisitors request, CallOptions options);
-      global::BioService.LocationList LocationSelect(global::BioService.CommandLocations request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      global::BioService.LocationList LocationSelect(global::BioService.CommandLocations request, CallOptions options);
-      AsyncUnaryCall<global::BioService.LocationList> LocationSelectAsync(global::BioService.CommandLocations request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      AsyncUnaryCall<global::BioService.LocationList> LocationSelectAsync(global::BioService.CommandLocations request, CallOptions options);
-      global::BioService.PhotoList PhotoSelect(global::BioService.CommandPhoto request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      global::BioService.PhotoList PhotoSelect(global::BioService.CommandPhoto request, CallOptions options);
-      AsyncUnaryCall<global::BioService.PhotoList> PhotoSelectAsync(global::BioService.CommandPhoto request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      AsyncUnaryCall<global::BioService.PhotoList> PhotoSelectAsync(global::BioService.CommandPhoto request, CallOptions options);
-      global::BioService.PersonList PersonUpdate(global::BioService.PersonList request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      global::BioService.PersonList PersonUpdate(global::BioService.PersonList request, CallOptions options);
-      AsyncUnaryCall<global::BioService.PersonList> PersonUpdateAsync(global::BioService.PersonList request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      AsyncUnaryCall<global::BioService.PersonList> PersonUpdateAsync(global::BioService.PersonList request, CallOptions options);
-      global::BioService.VisitorList VisitorUpdate(global::BioService.VisitorList request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      global::BioService.VisitorList VisitorUpdate(global::BioService.VisitorList request, CallOptions options);
-      AsyncUnaryCall<global::BioService.VisitorList> VisitorUpdateAsync(global::BioService.VisitorList request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      AsyncUnaryCall<global::BioService.VisitorList> VisitorUpdateAsync(global::BioService.VisitorList request, CallOptions options);
-      global::BioService.LocationList LocationUpdate(global::BioService.LocationList request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      global::BioService.LocationList LocationUpdate(global::BioService.LocationList request, CallOptions options);
-      AsyncUnaryCall<global::BioService.LocationList> LocationUpdateAsync(global::BioService.LocationList request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
-      AsyncUnaryCall<global::BioService.LocationList> LocationUpdateAsync(global::BioService.LocationList request, CallOptions options);
+      global::BioService.PersonList PersonSelect(global::BioService.QueryPersons request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.PersonList PersonSelect(global::BioService.QueryPersons request, CallOptions options);
+      AsyncUnaryCall<global::BioService.PersonList> PersonSelectAsync(global::BioService.QueryPersons request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.PersonList> PersonSelectAsync(global::BioService.QueryPersons request, CallOptions options);
+      global::BioService.Person AddPerson(global::BioService.Person request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.Person AddPerson(global::BioService.Person request, CallOptions options);
+      AsyncUnaryCall<global::BioService.Person> AddPersonAsync(global::BioService.Person request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.Person> AddPersonAsync(global::BioService.Person request, CallOptions options);
+      global::BioService.Person UpdatePerson(global::BioService.Person request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.Person UpdatePerson(global::BioService.Person request, CallOptions options);
+      AsyncUnaryCall<global::BioService.Person> UpdatePersonAsync(global::BioService.Person request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.Person> UpdatePersonAsync(global::BioService.Person request, CallOptions options);
+      global::BioService.Person RemovePerson(global::BioService.Person request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.Person RemovePerson(global::BioService.Person request, CallOptions options);
+      AsyncUnaryCall<global::BioService.Person> RemovePersonAsync(global::BioService.Person request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.Person> RemovePersonAsync(global::BioService.Person request, CallOptions options);
+      global::BioService.Response SetThumbnail(global::BioService.Photo request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.Response SetThumbnail(global::BioService.Photo request, CallOptions options);
+      AsyncUnaryCall<global::BioService.Response> SetThumbnailAsync(global::BioService.Photo request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.Response> SetThumbnailAsync(global::BioService.Photo request, CallOptions options);
+      global::BioService.Card AddCard(global::BioService.Card request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.Card AddCard(global::BioService.Card request, CallOptions options);
+      AsyncUnaryCall<global::BioService.Card> AddCardAsync(global::BioService.Card request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.Card> AddCardAsync(global::BioService.Card request, CallOptions options);
+      global::BioService.RawIndexes RemoveCards(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.RawIndexes RemoveCards(global::BioService.RawIndexes request, CallOptions options);
+      AsyncUnaryCall<global::BioService.RawIndexes> RemoveCardsAsync(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.RawIndexes> RemoveCardsAsync(global::BioService.RawIndexes request, CallOptions options);
+      global::BioService.PhotoList SelectPhotos(global::BioService.QueryPhoto request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.PhotoList SelectPhotos(global::BioService.QueryPhoto request, CallOptions options);
+      AsyncUnaryCall<global::BioService.PhotoList> SelectPhotosAsync(global::BioService.QueryPhoto request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.PhotoList> SelectPhotosAsync(global::BioService.QueryPhoto request, CallOptions options);
+      global::BioService.Photo AddPhoto(global::BioService.Photo request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.Photo AddPhoto(global::BioService.Photo request, CallOptions options);
+      AsyncUnaryCall<global::BioService.Photo> AddPhotoAsync(global::BioService.Photo request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.Photo> AddPhotoAsync(global::BioService.Photo request, CallOptions options);
+      global::BioService.RawIndexes RemovePhotos(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.RawIndexes RemovePhotos(global::BioService.RawIndexes request, CallOptions options);
+      AsyncUnaryCall<global::BioService.RawIndexes> RemovePhotosAsync(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.RawIndexes> RemovePhotosAsync(global::BioService.RawIndexes request, CallOptions options);
+      global::BioService.VisitorList SelectVisitors(global::BioService.QueryVisitors request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.VisitorList SelectVisitors(global::BioService.QueryVisitors request, CallOptions options);
+      AsyncUnaryCall<global::BioService.VisitorList> SelectVisitorsAsync(global::BioService.QueryVisitors request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.VisitorList> SelectVisitorsAsync(global::BioService.QueryVisitors request, CallOptions options);
+      global::BioService.Response AttachVisitorToPerson(global::BioService.Visitor request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.Response AttachVisitorToPerson(global::BioService.Visitor request, CallOptions options);
+      AsyncUnaryCall<global::BioService.Response> AttachVisitorToPersonAsync(global::BioService.Visitor request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.Response> AttachVisitorToPersonAsync(global::BioService.Visitor request, CallOptions options);
+      global::BioService.RawIndexes RemoveVisitors(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.RawIndexes RemoveVisitors(global::BioService.RawIndexes request, CallOptions options);
+      AsyncUnaryCall<global::BioService.RawIndexes> RemoveVisitorsAsync(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.RawIndexes> RemoveVisitorsAsync(global::BioService.RawIndexes request, CallOptions options);
+      global::BioService.LocationList SelectLocations(global::BioService.QueryLocations request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.LocationList SelectLocations(global::BioService.QueryLocations request, CallOptions options);
+      AsyncUnaryCall<global::BioService.LocationList> SelectLocationsAsync(global::BioService.QueryLocations request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.LocationList> SelectLocationsAsync(global::BioService.QueryLocations request, CallOptions options);
+      global::BioService.Location AddLocation(global::BioService.Location request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.Location AddLocation(global::BioService.Location request, CallOptions options);
+      AsyncUnaryCall<global::BioService.Location> AddLocationAsync(global::BioService.Location request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.Location> AddLocationAsync(global::BioService.Location request, CallOptions options);
+      global::BioService.Location UpdateLocation(global::BioService.Location request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.Location UpdateLocation(global::BioService.Location request, CallOptions options);
+      AsyncUnaryCall<global::BioService.Location> UpdateLocationAsync(global::BioService.Location request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.Location> UpdateLocationAsync(global::BioService.Location request, CallOptions options);
+      global::BioService.RawIndexes RemoveLocations(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      global::BioService.RawIndexes RemoveLocations(global::BioService.RawIndexes request, CallOptions options);
+      AsyncUnaryCall<global::BioService.RawIndexes> RemoveLocationsAsync(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken));
+      AsyncUnaryCall<global::BioService.RawIndexes> RemoveLocationsAsync(global::BioService.RawIndexes request, CallOptions options);
     }
 
     // server-side interface
     public interface IBiometricDatabaseSevice
     {
-      Task<global::BioService.Response> AddSocket(global::BioService.SocketConfiguration request, ServerCallContext context);
-      Task<global::BioService.PersonList> PersonSelect(global::BioService.CommandPersons request, ServerCallContext context);
-      Task<global::BioService.VisitorList> VisitorSelect(global::BioService.CommandVisitors request, ServerCallContext context);
-      Task<global::BioService.LocationList> LocationSelect(global::BioService.CommandLocations request, ServerCallContext context);
-      Task<global::BioService.PhotoList> PhotoSelect(global::BioService.CommandPhoto request, ServerCallContext context);
-      Task<global::BioService.PersonList> PersonUpdate(global::BioService.PersonList request, ServerCallContext context);
-      Task<global::BioService.VisitorList> VisitorUpdate(global::BioService.VisitorList request, ServerCallContext context);
-      Task<global::BioService.LocationList> LocationUpdate(global::BioService.LocationList request, ServerCallContext context);
+      Task<global::BioService.PersonList> PersonSelect(global::BioService.QueryPersons request, ServerCallContext context);
+      Task<global::BioService.Person> AddPerson(global::BioService.Person request, ServerCallContext context);
+      Task<global::BioService.Person> UpdatePerson(global::BioService.Person request, ServerCallContext context);
+      Task<global::BioService.Person> RemovePerson(global::BioService.Person request, ServerCallContext context);
+      Task<global::BioService.Response> SetThumbnail(global::BioService.Photo request, ServerCallContext context);
+      Task<global::BioService.Card> AddCard(global::BioService.Card request, ServerCallContext context);
+      Task<global::BioService.RawIndexes> RemoveCards(global::BioService.RawIndexes request, ServerCallContext context);
+      Task<global::BioService.PhotoList> SelectPhotos(global::BioService.QueryPhoto request, ServerCallContext context);
+      Task<global::BioService.Photo> AddPhoto(global::BioService.Photo request, ServerCallContext context);
+      Task<global::BioService.RawIndexes> RemovePhotos(global::BioService.RawIndexes request, ServerCallContext context);
+      Task<global::BioService.VisitorList> SelectVisitors(global::BioService.QueryVisitors request, ServerCallContext context);
+      Task<global::BioService.Response> AttachVisitorToPerson(global::BioService.Visitor request, ServerCallContext context);
+      Task<global::BioService.RawIndexes> RemoveVisitors(global::BioService.RawIndexes request, ServerCallContext context);
+      Task<global::BioService.LocationList> SelectLocations(global::BioService.QueryLocations request, ServerCallContext context);
+      Task<global::BioService.Location> AddLocation(global::BioService.Location request, ServerCallContext context);
+      Task<global::BioService.Location> UpdateLocation(global::BioService.Location request, ServerCallContext context);
+      Task<global::BioService.RawIndexes> RemoveLocations(global::BioService.RawIndexes request, ServerCallContext context);
     }
 
     // client stub
@@ -264,164 +377,344 @@ namespace BioService {
       public BiometricDatabaseSeviceClient(Channel channel) : base(channel)
       {
       }
-      public global::BioService.Response AddSocket(global::BioService.SocketConfiguration request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
-      {
-        var call = CreateCall(__Method_AddSocket, new CallOptions(headers, deadline, cancellationToken));
-        return Calls.BlockingUnaryCall(call, request);
-      }
-      public global::BioService.Response AddSocket(global::BioService.SocketConfiguration request, CallOptions options)
-      {
-        var call = CreateCall(__Method_AddSocket, options);
-        return Calls.BlockingUnaryCall(call, request);
-      }
-      public AsyncUnaryCall<global::BioService.Response> AddSocketAsync(global::BioService.SocketConfiguration request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
-      {
-        var call = CreateCall(__Method_AddSocket, new CallOptions(headers, deadline, cancellationToken));
-        return Calls.AsyncUnaryCall(call, request);
-      }
-      public AsyncUnaryCall<global::BioService.Response> AddSocketAsync(global::BioService.SocketConfiguration request, CallOptions options)
-      {
-        var call = CreateCall(__Method_AddSocket, options);
-        return Calls.AsyncUnaryCall(call, request);
-      }
-      public global::BioService.PersonList PersonSelect(global::BioService.CommandPersons request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public global::BioService.PersonList PersonSelect(global::BioService.QueryPersons request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
         var call = CreateCall(__Method_PersonSelect, new CallOptions(headers, deadline, cancellationToken));
         return Calls.BlockingUnaryCall(call, request);
       }
-      public global::BioService.PersonList PersonSelect(global::BioService.CommandPersons request, CallOptions options)
+      public global::BioService.PersonList PersonSelect(global::BioService.QueryPersons request, CallOptions options)
       {
         var call = CreateCall(__Method_PersonSelect, options);
         return Calls.BlockingUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.PersonList> PersonSelectAsync(global::BioService.CommandPersons request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public AsyncUnaryCall<global::BioService.PersonList> PersonSelectAsync(global::BioService.QueryPersons request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
         var call = CreateCall(__Method_PersonSelect, new CallOptions(headers, deadline, cancellationToken));
         return Calls.AsyncUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.PersonList> PersonSelectAsync(global::BioService.CommandPersons request, CallOptions options)
+      public AsyncUnaryCall<global::BioService.PersonList> PersonSelectAsync(global::BioService.QueryPersons request, CallOptions options)
       {
         var call = CreateCall(__Method_PersonSelect, options);
         return Calls.AsyncUnaryCall(call, request);
       }
-      public global::BioService.VisitorList VisitorSelect(global::BioService.CommandVisitors request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public global::BioService.Person AddPerson(global::BioService.Person request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
-        var call = CreateCall(__Method_VisitorSelect, new CallOptions(headers, deadline, cancellationToken));
+        var call = CreateCall(__Method_AddPerson, new CallOptions(headers, deadline, cancellationToken));
         return Calls.BlockingUnaryCall(call, request);
       }
-      public global::BioService.VisitorList VisitorSelect(global::BioService.CommandVisitors request, CallOptions options)
+      public global::BioService.Person AddPerson(global::BioService.Person request, CallOptions options)
       {
-        var call = CreateCall(__Method_VisitorSelect, options);
+        var call = CreateCall(__Method_AddPerson, options);
         return Calls.BlockingUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.VisitorList> VisitorSelectAsync(global::BioService.CommandVisitors request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public AsyncUnaryCall<global::BioService.Person> AddPersonAsync(global::BioService.Person request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
-        var call = CreateCall(__Method_VisitorSelect, new CallOptions(headers, deadline, cancellationToken));
+        var call = CreateCall(__Method_AddPerson, new CallOptions(headers, deadline, cancellationToken));
         return Calls.AsyncUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.VisitorList> VisitorSelectAsync(global::BioService.CommandVisitors request, CallOptions options)
+      public AsyncUnaryCall<global::BioService.Person> AddPersonAsync(global::BioService.Person request, CallOptions options)
       {
-        var call = CreateCall(__Method_VisitorSelect, options);
+        var call = CreateCall(__Method_AddPerson, options);
         return Calls.AsyncUnaryCall(call, request);
       }
-      public global::BioService.LocationList LocationSelect(global::BioService.CommandLocations request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public global::BioService.Person UpdatePerson(global::BioService.Person request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
-        var call = CreateCall(__Method_LocationSelect, new CallOptions(headers, deadline, cancellationToken));
+        var call = CreateCall(__Method_UpdatePerson, new CallOptions(headers, deadline, cancellationToken));
         return Calls.BlockingUnaryCall(call, request);
       }
-      public global::BioService.LocationList LocationSelect(global::BioService.CommandLocations request, CallOptions options)
+      public global::BioService.Person UpdatePerson(global::BioService.Person request, CallOptions options)
       {
-        var call = CreateCall(__Method_LocationSelect, options);
+        var call = CreateCall(__Method_UpdatePerson, options);
         return Calls.BlockingUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.LocationList> LocationSelectAsync(global::BioService.CommandLocations request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public AsyncUnaryCall<global::BioService.Person> UpdatePersonAsync(global::BioService.Person request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
-        var call = CreateCall(__Method_LocationSelect, new CallOptions(headers, deadline, cancellationToken));
+        var call = CreateCall(__Method_UpdatePerson, new CallOptions(headers, deadline, cancellationToken));
         return Calls.AsyncUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.LocationList> LocationSelectAsync(global::BioService.CommandLocations request, CallOptions options)
+      public AsyncUnaryCall<global::BioService.Person> UpdatePersonAsync(global::BioService.Person request, CallOptions options)
       {
-        var call = CreateCall(__Method_LocationSelect, options);
+        var call = CreateCall(__Method_UpdatePerson, options);
         return Calls.AsyncUnaryCall(call, request);
       }
-      public global::BioService.PhotoList PhotoSelect(global::BioService.CommandPhoto request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public global::BioService.Person RemovePerson(global::BioService.Person request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
-        var call = CreateCall(__Method_PhotoSelect, new CallOptions(headers, deadline, cancellationToken));
+        var call = CreateCall(__Method_RemovePerson, new CallOptions(headers, deadline, cancellationToken));
         return Calls.BlockingUnaryCall(call, request);
       }
-      public global::BioService.PhotoList PhotoSelect(global::BioService.CommandPhoto request, CallOptions options)
+      public global::BioService.Person RemovePerson(global::BioService.Person request, CallOptions options)
       {
-        var call = CreateCall(__Method_PhotoSelect, options);
+        var call = CreateCall(__Method_RemovePerson, options);
         return Calls.BlockingUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.PhotoList> PhotoSelectAsync(global::BioService.CommandPhoto request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public AsyncUnaryCall<global::BioService.Person> RemovePersonAsync(global::BioService.Person request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
-        var call = CreateCall(__Method_PhotoSelect, new CallOptions(headers, deadline, cancellationToken));
+        var call = CreateCall(__Method_RemovePerson, new CallOptions(headers, deadline, cancellationToken));
         return Calls.AsyncUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.PhotoList> PhotoSelectAsync(global::BioService.CommandPhoto request, CallOptions options)
+      public AsyncUnaryCall<global::BioService.Person> RemovePersonAsync(global::BioService.Person request, CallOptions options)
       {
-        var call = CreateCall(__Method_PhotoSelect, options);
+        var call = CreateCall(__Method_RemovePerson, options);
         return Calls.AsyncUnaryCall(call, request);
       }
-      public global::BioService.PersonList PersonUpdate(global::BioService.PersonList request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public global::BioService.Response SetThumbnail(global::BioService.Photo request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
-        var call = CreateCall(__Method_PersonUpdate, new CallOptions(headers, deadline, cancellationToken));
+        var call = CreateCall(__Method_SetThumbnail, new CallOptions(headers, deadline, cancellationToken));
         return Calls.BlockingUnaryCall(call, request);
       }
-      public global::BioService.PersonList PersonUpdate(global::BioService.PersonList request, CallOptions options)
+      public global::BioService.Response SetThumbnail(global::BioService.Photo request, CallOptions options)
       {
-        var call = CreateCall(__Method_PersonUpdate, options);
+        var call = CreateCall(__Method_SetThumbnail, options);
         return Calls.BlockingUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.PersonList> PersonUpdateAsync(global::BioService.PersonList request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public AsyncUnaryCall<global::BioService.Response> SetThumbnailAsync(global::BioService.Photo request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
-        var call = CreateCall(__Method_PersonUpdate, new CallOptions(headers, deadline, cancellationToken));
+        var call = CreateCall(__Method_SetThumbnail, new CallOptions(headers, deadline, cancellationToken));
         return Calls.AsyncUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.PersonList> PersonUpdateAsync(global::BioService.PersonList request, CallOptions options)
+      public AsyncUnaryCall<global::BioService.Response> SetThumbnailAsync(global::BioService.Photo request, CallOptions options)
       {
-        var call = CreateCall(__Method_PersonUpdate, options);
+        var call = CreateCall(__Method_SetThumbnail, options);
         return Calls.AsyncUnaryCall(call, request);
       }
-      public global::BioService.VisitorList VisitorUpdate(global::BioService.VisitorList request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public global::BioService.Card AddCard(global::BioService.Card request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
-        var call = CreateCall(__Method_VisitorUpdate, new CallOptions(headers, deadline, cancellationToken));
+        var call = CreateCall(__Method_AddCard, new CallOptions(headers, deadline, cancellationToken));
         return Calls.BlockingUnaryCall(call, request);
       }
-      public global::BioService.VisitorList VisitorUpdate(global::BioService.VisitorList request, CallOptions options)
+      public global::BioService.Card AddCard(global::BioService.Card request, CallOptions options)
       {
-        var call = CreateCall(__Method_VisitorUpdate, options);
+        var call = CreateCall(__Method_AddCard, options);
         return Calls.BlockingUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.VisitorList> VisitorUpdateAsync(global::BioService.VisitorList request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public AsyncUnaryCall<global::BioService.Card> AddCardAsync(global::BioService.Card request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
-        var call = CreateCall(__Method_VisitorUpdate, new CallOptions(headers, deadline, cancellationToken));
+        var call = CreateCall(__Method_AddCard, new CallOptions(headers, deadline, cancellationToken));
         return Calls.AsyncUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.VisitorList> VisitorUpdateAsync(global::BioService.VisitorList request, CallOptions options)
+      public AsyncUnaryCall<global::BioService.Card> AddCardAsync(global::BioService.Card request, CallOptions options)
       {
-        var call = CreateCall(__Method_VisitorUpdate, options);
+        var call = CreateCall(__Method_AddCard, options);
         return Calls.AsyncUnaryCall(call, request);
       }
-      public global::BioService.LocationList LocationUpdate(global::BioService.LocationList request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public global::BioService.RawIndexes RemoveCards(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
-        var call = CreateCall(__Method_LocationUpdate, new CallOptions(headers, deadline, cancellationToken));
+        var call = CreateCall(__Method_RemoveCards, new CallOptions(headers, deadline, cancellationToken));
         return Calls.BlockingUnaryCall(call, request);
       }
-      public global::BioService.LocationList LocationUpdate(global::BioService.LocationList request, CallOptions options)
+      public global::BioService.RawIndexes RemoveCards(global::BioService.RawIndexes request, CallOptions options)
       {
-        var call = CreateCall(__Method_LocationUpdate, options);
+        var call = CreateCall(__Method_RemoveCards, options);
         return Calls.BlockingUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.LocationList> LocationUpdateAsync(global::BioService.LocationList request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      public AsyncUnaryCall<global::BioService.RawIndexes> RemoveCardsAsync(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
       {
-        var call = CreateCall(__Method_LocationUpdate, new CallOptions(headers, deadline, cancellationToken));
+        var call = CreateCall(__Method_RemoveCards, new CallOptions(headers, deadline, cancellationToken));
         return Calls.AsyncUnaryCall(call, request);
       }
-      public AsyncUnaryCall<global::BioService.LocationList> LocationUpdateAsync(global::BioService.LocationList request, CallOptions options)
+      public AsyncUnaryCall<global::BioService.RawIndexes> RemoveCardsAsync(global::BioService.RawIndexes request, CallOptions options)
       {
-        var call = CreateCall(__Method_LocationUpdate, options);
+        var call = CreateCall(__Method_RemoveCards, options);
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public global::BioService.PhotoList SelectPhotos(global::BioService.QueryPhoto request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_SelectPhotos, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public global::BioService.PhotoList SelectPhotos(global::BioService.QueryPhoto request, CallOptions options)
+      {
+        var call = CreateCall(__Method_SelectPhotos, options);
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.PhotoList> SelectPhotosAsync(global::BioService.QueryPhoto request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_SelectPhotos, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.PhotoList> SelectPhotosAsync(global::BioService.QueryPhoto request, CallOptions options)
+      {
+        var call = CreateCall(__Method_SelectPhotos, options);
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public global::BioService.Photo AddPhoto(global::BioService.Photo request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_AddPhoto, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public global::BioService.Photo AddPhoto(global::BioService.Photo request, CallOptions options)
+      {
+        var call = CreateCall(__Method_AddPhoto, options);
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.Photo> AddPhotoAsync(global::BioService.Photo request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_AddPhoto, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.Photo> AddPhotoAsync(global::BioService.Photo request, CallOptions options)
+      {
+        var call = CreateCall(__Method_AddPhoto, options);
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public global::BioService.RawIndexes RemovePhotos(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_RemovePhotos, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public global::BioService.RawIndexes RemovePhotos(global::BioService.RawIndexes request, CallOptions options)
+      {
+        var call = CreateCall(__Method_RemovePhotos, options);
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.RawIndexes> RemovePhotosAsync(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_RemovePhotos, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.RawIndexes> RemovePhotosAsync(global::BioService.RawIndexes request, CallOptions options)
+      {
+        var call = CreateCall(__Method_RemovePhotos, options);
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public global::BioService.VisitorList SelectVisitors(global::BioService.QueryVisitors request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_SelectVisitors, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public global::BioService.VisitorList SelectVisitors(global::BioService.QueryVisitors request, CallOptions options)
+      {
+        var call = CreateCall(__Method_SelectVisitors, options);
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.VisitorList> SelectVisitorsAsync(global::BioService.QueryVisitors request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_SelectVisitors, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.VisitorList> SelectVisitorsAsync(global::BioService.QueryVisitors request, CallOptions options)
+      {
+        var call = CreateCall(__Method_SelectVisitors, options);
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public global::BioService.Response AttachVisitorToPerson(global::BioService.Visitor request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_AttachVisitorToPerson, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public global::BioService.Response AttachVisitorToPerson(global::BioService.Visitor request, CallOptions options)
+      {
+        var call = CreateCall(__Method_AttachVisitorToPerson, options);
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.Response> AttachVisitorToPersonAsync(global::BioService.Visitor request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_AttachVisitorToPerson, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.Response> AttachVisitorToPersonAsync(global::BioService.Visitor request, CallOptions options)
+      {
+        var call = CreateCall(__Method_AttachVisitorToPerson, options);
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public global::BioService.RawIndexes RemoveVisitors(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_RemoveVisitors, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public global::BioService.RawIndexes RemoveVisitors(global::BioService.RawIndexes request, CallOptions options)
+      {
+        var call = CreateCall(__Method_RemoveVisitors, options);
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.RawIndexes> RemoveVisitorsAsync(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_RemoveVisitors, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.RawIndexes> RemoveVisitorsAsync(global::BioService.RawIndexes request, CallOptions options)
+      {
+        var call = CreateCall(__Method_RemoveVisitors, options);
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public global::BioService.LocationList SelectLocations(global::BioService.QueryLocations request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_SelectLocations, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public global::BioService.LocationList SelectLocations(global::BioService.QueryLocations request, CallOptions options)
+      {
+        var call = CreateCall(__Method_SelectLocations, options);
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.LocationList> SelectLocationsAsync(global::BioService.QueryLocations request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_SelectLocations, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.LocationList> SelectLocationsAsync(global::BioService.QueryLocations request, CallOptions options)
+      {
+        var call = CreateCall(__Method_SelectLocations, options);
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public global::BioService.Location AddLocation(global::BioService.Location request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_AddLocation, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public global::BioService.Location AddLocation(global::BioService.Location request, CallOptions options)
+      {
+        var call = CreateCall(__Method_AddLocation, options);
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.Location> AddLocationAsync(global::BioService.Location request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_AddLocation, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.Location> AddLocationAsync(global::BioService.Location request, CallOptions options)
+      {
+        var call = CreateCall(__Method_AddLocation, options);
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public global::BioService.Location UpdateLocation(global::BioService.Location request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_UpdateLocation, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public global::BioService.Location UpdateLocation(global::BioService.Location request, CallOptions options)
+      {
+        var call = CreateCall(__Method_UpdateLocation, options);
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.Location> UpdateLocationAsync(global::BioService.Location request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_UpdateLocation, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.Location> UpdateLocationAsync(global::BioService.Location request, CallOptions options)
+      {
+        var call = CreateCall(__Method_UpdateLocation, options);
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public global::BioService.RawIndexes RemoveLocations(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_RemoveLocations, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public global::BioService.RawIndexes RemoveLocations(global::BioService.RawIndexes request, CallOptions options)
+      {
+        var call = CreateCall(__Method_RemoveLocations, options);
+        return Calls.BlockingUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.RawIndexes> RemoveLocationsAsync(global::BioService.RawIndexes request, Metadata headers = null, DateTime? deadline = null, CancellationToken cancellationToken = default(CancellationToken))
+      {
+        var call = CreateCall(__Method_RemoveLocations, new CallOptions(headers, deadline, cancellationToken));
+        return Calls.AsyncUnaryCall(call, request);
+      }
+      public AsyncUnaryCall<global::BioService.RawIndexes> RemoveLocationsAsync(global::BioService.RawIndexes request, CallOptions options)
+      {
+        var call = CreateCall(__Method_RemoveLocations, options);
         return Calls.AsyncUnaryCall(call, request);
       }
     }
@@ -430,14 +723,23 @@ namespace BioService {
     public static ServerServiceDefinition BindService(IBiometricDatabaseSevice serviceImpl)
     {
       return ServerServiceDefinition.CreateBuilder(__ServiceName)
-          .AddMethod(__Method_AddSocket, serviceImpl.AddSocket)
           .AddMethod(__Method_PersonSelect, serviceImpl.PersonSelect)
-          .AddMethod(__Method_VisitorSelect, serviceImpl.VisitorSelect)
-          .AddMethod(__Method_LocationSelect, serviceImpl.LocationSelect)
-          .AddMethod(__Method_PhotoSelect, serviceImpl.PhotoSelect)
-          .AddMethod(__Method_PersonUpdate, serviceImpl.PersonUpdate)
-          .AddMethod(__Method_VisitorUpdate, serviceImpl.VisitorUpdate)
-          .AddMethod(__Method_LocationUpdate, serviceImpl.LocationUpdate).Build();
+          .AddMethod(__Method_AddPerson, serviceImpl.AddPerson)
+          .AddMethod(__Method_UpdatePerson, serviceImpl.UpdatePerson)
+          .AddMethod(__Method_RemovePerson, serviceImpl.RemovePerson)
+          .AddMethod(__Method_SetThumbnail, serviceImpl.SetThumbnail)
+          .AddMethod(__Method_AddCard, serviceImpl.AddCard)
+          .AddMethod(__Method_RemoveCards, serviceImpl.RemoveCards)
+          .AddMethod(__Method_SelectPhotos, serviceImpl.SelectPhotos)
+          .AddMethod(__Method_AddPhoto, serviceImpl.AddPhoto)
+          .AddMethod(__Method_RemovePhotos, serviceImpl.RemovePhotos)
+          .AddMethod(__Method_SelectVisitors, serviceImpl.SelectVisitors)
+          .AddMethod(__Method_AttachVisitorToPerson, serviceImpl.AttachVisitorToPerson)
+          .AddMethod(__Method_RemoveVisitors, serviceImpl.RemoveVisitors)
+          .AddMethod(__Method_SelectLocations, serviceImpl.SelectLocations)
+          .AddMethod(__Method_AddLocation, serviceImpl.AddLocation)
+          .AddMethod(__Method_UpdateLocation, serviceImpl.UpdateLocation)
+          .AddMethod(__Method_RemoveLocations, serviceImpl.RemoveLocations).Build();
     }
 
     // creates a new client

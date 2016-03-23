@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace BioData.Utils
@@ -11,7 +7,7 @@ namespace BioData.Utils
     {
         public string LocalStorage
         {
-            get { return "D:\\GRPCs\\ClientFolder\\"; }
+            get { return "F:\\Biometric Software\\Client\\"; }
         }
 
         public Google.Protobuf.ByteString GetFileDescription( string path )
@@ -28,7 +24,7 @@ namespace BioData.Utils
             DateTime date = DateTime.Now;
 
             string filename = date.Ticks.ToString() + ".jpg";
-            string localPath = String.Format("media\\location\\{0}\\{1}\\{2}\\{3}\\photo\\{4}"
+            string localPath = string.Format("media\\location\\{0}\\{1}\\{2}\\{3}\\photo\\{4}"
                                             , locationid
                                             , date.Year
                                             , date.Month
@@ -68,8 +64,6 @@ namespace BioData.Utils
 
             return localPath;
         }
-
-
 
        public string SavePersonImage( Google.Protobuf.ByteString bytes, long personid)
        {
@@ -177,11 +171,17 @@ namespace BioData.Utils
           if (File.Exists(path))
              return;
 
-          Directory.CreateDirectory(Path.GetDirectoryName(path));
-
-          var fs = new BinaryWriter( new FileStream( path, FileMode.CreateNew, FileAccess.Write));
-          fs.Write(bytes);
-          fs.Close();
+           try
+           {
+             Directory.CreateDirectory(Path.GetDirectoryName(path));
+           
+             var fs = new BinaryWriter(new FileStream(path, FileMode.CreateNew, FileAccess.Write));
+             fs.Write(bytes);
+             fs.Close();
+           }
+           catch ( Exception ex) {
+             Console.WriteLine(ex.Message);
+           }
         }
 
     }

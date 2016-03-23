@@ -22,6 +22,7 @@ namespace BioData.DataHolders
 
     public BioService.Photo UpdateFromProto(BioService.Photo proto)
     {
+      /*
       Photo entity = _convertor.GetPhotoEntity(proto);
 
       if (entity == null)
@@ -67,12 +68,12 @@ namespace BioData.DataHolders
                  , EntityState = entityState };                
         }                
       }
-
+      */
       return new BioService.Photo(proto);      
     }
 
     private void UpdateLocalPhoto( BioService.Photo item )
-    {
+    {/*
        try
        {
            if (item.Description != null && item.Description.Length > 0)
@@ -85,6 +86,7 @@ namespace BioData.DataHolders
        {
          Console.WriteLine(ex.Message);
        }
+       */
     }
 
     public override Photo Add(Photo item)
@@ -145,7 +147,6 @@ namespace BioData.DataHolders
                 if (item.Person_Id > 0)
                     original.Person_Id = item.Person_Id;
 
-
                 success = Save();
             }
         }
@@ -162,9 +163,9 @@ namespace BioData.DataHolders
       return _dataContext.Photo;
     }
 
-    public BioService.PhotoList Select(BioService.CommandPhoto command)
+    public BioService.PhotoList Select(BioService.QueryPhoto command)
     {
-
+      /*
       HashSet<long> targetPhotoIDs  = new HashSet<long>();
       HashSet<long> targetPersonIDs = new HashSet<long>();
       if (command.TargetPhoto != null && command.TargetPhoto.Count > 0)
@@ -220,8 +221,8 @@ namespace BioData.DataHolders
             photos.Photos.Add(proto);
         }
       }
-
-      return photos;
+      */
+      return null;
     }
 
     private readonly IOUtils _utils;

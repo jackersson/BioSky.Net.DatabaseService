@@ -12,7 +12,9 @@ namespace BioData.DataModels
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Photo()
         {
+            PersonCollection = new HashSet<Person>();
             Visitor = new HashSet<Visitor>();
+            VisitorCollection = new HashSet<Visitor>();
         }
 
         public long Id { get; set; }
@@ -20,12 +22,9 @@ namespace BioData.DataModels
         [Column("Person Id")]
         public long? Person_Id { get; set; }
 
-        [Column("Fir Pathway")]
-        public string Fir_Pathway { get; set; }
-
-        [Column("Image Pathway")]
+        [Column("Photo Url")]
         [Required]
-        public string Image_Pathway { get; set; }
+        public string Photo_Url { get; set; }
 
         [Column("Size Type")]
         public byte? Size_Type { get; set; }
@@ -33,9 +32,26 @@ namespace BioData.DataModels
         [Column("Origin Type")]
         public byte? Origin_Type { get; set; }
 
+        public int? Width { get; set; }
+
+        public int? Height { get; set; }
+
+        [Column("Portrait Characteristics Id")]
+        public long? Portrait_Characteristics_Id { get; set; }
+
+        public DateTime? Datetime { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Person> PersonCollection { get; set; }
+
         public virtual Person Person { get; set; }
+
+        public virtual PortraitCharacteristic PortraitCharacteristic { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Visitor> Visitor { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Visitor> VisitorCollection { get; set; }
     }
 }

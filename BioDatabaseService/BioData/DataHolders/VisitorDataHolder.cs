@@ -19,6 +19,7 @@ namespace BioData.DataHolders
 
     public BioService.Visitor UpdateFromProto(BioService.Visitor proto)
     {
+      /*
       Visitor entity = _convertor.GetVisitorEntity(proto);
 
       if (entity == null)
@@ -63,7 +64,7 @@ namespace BioData.DataHolders
                  , EntityState = entityState };                
         }                
       }
-
+      */
       return new BioService.Visitor() { Id = proto.Id };      
     }
 

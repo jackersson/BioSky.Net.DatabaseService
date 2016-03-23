@@ -55,7 +55,7 @@ namespace BioData.DataHolders.Grouped
       IQueryable<CaptureDevice> captureDevicesToRemove = _captureDevices.Select().Where(x => x.Location_Id == updated.Id);
       foreach (CaptureDevice cp in captureDevicesToRemove)
           _captureDevices.Remove(cp);         
-      
+      /*
       
       long targetID = updated.Id;
       foreach (BioService.AccessDevice ac in proto.AccessDevices)
@@ -75,12 +75,12 @@ namespace BioData.DataHolders.Grouped
         BioService.CaptureDevice updatedCDProto = _captureDevices.UpdateFromProto(ac);
         if (updatedCDProto != null)
           updated.CaptureDevices.Add(updatedCDProto);
-      }
+      }*/
 
       return updated;
     }
 
-    public BioService.LocationList Select( BioService.CommandLocations command)
+    public BioService.LocationList Select( BioService.QueryLocations command)
     {
       BioService.LocationList result = new BioService.LocationList();
 
@@ -97,7 +97,7 @@ namespace BioData.DataHolders.Grouped
           continue;
 
         long locationid = location.Id;
-       
+       /*
         IQueryable<AccessDevice> locationAccessDevices = accessDevices.Where(x => x.Location_Id == locationid);
         foreach (AccessDevice ac in locationAccessDevices)
         {
@@ -113,7 +113,7 @@ namespace BioData.DataHolders.Grouped
           if (currentCaptureDeviceProto != null)
             protoLocation.CaptureDevices.Add(currentCaptureDeviceProto);
         }
-
+        */
         result.Locations.Add(protoLocation);
       }
     

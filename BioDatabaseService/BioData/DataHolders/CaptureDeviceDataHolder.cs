@@ -18,7 +18,7 @@ namespace BioData.DataHolders
     }
 
     public BioService.CaptureDevice UpdateFromProto(BioService.CaptureDevice proto)
-    {
+    {/*
       CaptureDevice entity = _convertor.GetCaptureDeviceEntity(proto);
 
       if (entity == null)
@@ -63,7 +63,7 @@ namespace BioData.DataHolders
                  , EntityState = entityState };                
         }                
       }
-
+      */
       return proto;      
     }
 

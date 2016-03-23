@@ -1,11 +1,7 @@
 ﻿using BioContracts;
 using BioData.DataModels;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BioData.DataHolders
 {
@@ -21,7 +17,7 @@ namespace BioData.DataHolders
     public BioService.Person UpdateFromProto(BioService.Person proto)
     {
       Person entity = _convertor.GetPersonEntity(proto);
-
+      /*
       if (entity == null)
         return null;
 
@@ -36,13 +32,13 @@ namespace BioData.DataHolders
           {
             BioService.Person newProto = _convertor.GetPersonProto(newEntity);
             newProto.EntityState = entityState;
-            newProto.Dbresult    = BioService.ResultStatus.Success;
+           // newProto.Dbresult    = BioService.ResultStatus.Success;
             return newProto;
           }
           else
           {
-            return new BioService.Person() { Dbresult = BioService.ResultStatus.Failed
-                                                 , EntityState = entityState };
+            //return new BioService.Person() { Dbresult = BioService.ResultStatus.Failed
+                                           //      , EntityState = entityState };
           }            
         }
 
@@ -70,7 +66,7 @@ namespace BioData.DataHolders
                  , Dbresult = state ? BioService.ResultStatus.Success : BioService.ResultStatus.Failed
                  , EntityState = entityState };                
         }                
-      }
+      }*/
 
       return new BioService.Person() { Id = proto.Id };      
     }
@@ -100,7 +96,7 @@ namespace BioData.DataHolders
       try
       {
          var original = _dataContext.Person.Find(item.Id);
-
+      
          if (original != null)
          {
              original.First_Name_   = item.First_Name_;
@@ -108,7 +104,7 @@ namespace BioData.DataHolders
              original.Gender        = item.Gender;
              original.Email         = item.Email;
              original.Rights        = item.Rights;
-             original.Thumbnail     = item.Thumbnail;
+            // original.Thumbnail     = item.Thumbnail;
              original.Country       = item.Country;
              original.Comments      = item.Comments;
              original.City          = item.City;

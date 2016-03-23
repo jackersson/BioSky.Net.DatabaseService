@@ -1,5 +1,6 @@
 ﻿using BioContracts;
 using BioData.DataHolders;
+using BioData.DataHolders.DataClient;
 using BioData.DataHolders.Grouped;
 using BioData.DataModels;
 using System;
@@ -13,7 +14,7 @@ namespace BioData
   public class BioSkyNetRepository
   {
    // private readonly IContextFactory _contextFactory;
-    private BioSkyNetDataModel _bioSkyNetContext;
+    //private BioSkyNetDataModel _bioSkyNetContext;
     private readonly IProcessorLocator _locator;
 
     public BioSkyNetRepository( IProcessorLocator locator   )
@@ -24,35 +25,29 @@ namespace BioData
 
       // _contextFactory = contextFactory;
 
-      InitializeContext();     
+      //InitializeContext();  
+      
+      CardsDataClient  = new CardDataClient(locator);
+      PhotosDataClient = new PhotoDataClient(locator);
 
-      _photos        = new PhotoDataHolder(locator);
+      AccessDeviceDataClient  acdt = new AccessDeviceDataClient (locator);
+      CaptureDeviceDataClient cddt = new CaptureDeviceDataClient(locator);
+      PersonAccessDataClient  padt = new PersonAccessDataClient (locator);
 
-      _fullPersons   = new FullPersonHolder(locator);
-      _fullVisitors  = new FullVisitorHolder(locator);
-      _fullLocations = new FullLocationHolder(locator);
+      LocationsDataClient  = new LocationDataClient(locator, acdt, cddt, padt);
+      VisitorsDataClient   = new VisitorDataClient(locator);
+
+      PDataClient = new PersonDataClient(locator, PhotosDataClient);
+      //_photos        = new PhotoDataHolder(locator);
+
+      // _fullPersons   = new FullPersonHolder(locator);
+      //_fullVisitors  = new FullVisitorHolder(locator);
+      //_fullLocations = new FullLocationHolder(locator);
     }
    
 
-    private bool InitializeContext()
-    {
-      try
-      {
-        IContextFactory contextFactory = _locator.GetProcessor<IContextFactory>();
-        if (contextFactory == null)
-           throw new ArgumentNullException("entityFrameworkContextFactory");
-
-        _bioSkyNetContext = contextFactory.Create<BioSkyNetDataModel>();
-
-        _bioSkyNetContext.Configuration.AutoDetectChangesEnabled = true;
-      
-        return true;
-      }
-      catch { }
-
-      return false;
-    }
-
+  
+    /*
     public PhotoDataHolder Photos()
     {
       return _photos;
@@ -77,6 +72,12 @@ namespace BioData
 
     private readonly FullPersonHolder   _fullPersons  ;
     private readonly FullVisitorHolder  _fullVisitors ;
-    private readonly FullLocationHolder _fullLocations;
+    private readonly FullLocationHolder _fullLocations;*/
+
+    public PersonDataClient   PDataClient       ;
+    public CardDataClient     CardsDataClient   ;
+    public PhotoDataClient    PhotosDataClient  ;
+    public LocationDataClient LocationsDataClient;
+    public VisitorDataClient  VisitorsDataClient ;
   }
 }

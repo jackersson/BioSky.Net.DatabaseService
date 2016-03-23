@@ -1,16 +1,11 @@
 ﻿using BioContracts;
 using BioData.DataModels;
 using BioData.Utils;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BioData.DataHolders.Grouped
 {
- 
+
   public class FullVisitorHolder
   {
     public FullVisitorHolder(IProcessorLocator locator)
@@ -39,6 +34,7 @@ namespace BioData.DataHolders.Grouped
 
     public BioService.Visitor Update(BioService.Visitor proto)
     {
+      /*
       if (proto.Photo != null)
       {
           proto.Photo.FileLocation = _utils.GetLocationImagePath(proto.Locationid);
@@ -67,13 +63,13 @@ namespace BioData.DataHolders.Grouped
           updatedVisitor.Photoid = cp.Id;
         }
       }   
-
-      return updatedVisitor;
+      */
+      return null;
     }
 
     
 
-    public BioService.VisitorList Select(BioService.CommandVisitors command)
+    public BioService.VisitorList Select(BioService.QueryVisitors command)
     {
       BioService.VisitorList result = new BioService.VisitorList();
 

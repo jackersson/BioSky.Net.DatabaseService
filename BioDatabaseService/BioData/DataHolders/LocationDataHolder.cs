@@ -20,6 +20,7 @@ namespace BioData.DataHolders
 
     public BioService.Location UpdateFromProto(BioService.Location proto)
     {
+      /*
       Location entity = _convertor.GetLocationEntity(proto);
 
       if (entity == null)
@@ -71,7 +72,7 @@ namespace BioData.DataHolders
                  , EntityState = entityState };                
         }                
       }
-
+      */
       return new BioService.Location() { Id = proto.Id };     
     }
 

@@ -39,6 +39,7 @@ namespace BioData.DataHolders.Grouped
     }
     public BioService.Person Update(BioService.Person proto)
     {
+      /*
       BioService.Person updatedPerson = _persons.UpdateFromProto(proto);
 
       if (updatedPerson == null)
@@ -101,13 +102,13 @@ namespace BioData.DataHolders.Grouped
         if (updatedCardProto != null)
           updatedPerson.Cards.Add(updatedCardProto);
       }    
-
-      return updatedPerson;
+      */
+      return null;
     }
 
 
 
-    public BioService.PersonList Select(BioService.CommandPersons command)
+    public BioService.PersonList Select(BioService.QueryPersons command)
     {
       BioService.PersonList result = new BioService.PersonList();
 
@@ -123,24 +124,7 @@ namespace BioData.DataHolders.Grouped
           continue;
 
         long personid = person.Id;
-        //long thumbnailid = 0;
-        //if (person.Thumbnail.HasValue)
-        //  thumbnailid = person.Thumbnail.Value;
-
-          /*
-        Photo thumbnail = photos.Where(x => x.Id == thumbnailid).FirstOrDefault();
-        if (thumbnail != null)
-          protoPerson.Thumbnail = _convertor.GetPhotoProto(thumbnail);
-          */
-          /*
-        IQueryable<Photo> personPhotos = photos.Where(x => x.Id != thumbnailid && x.Person_Id == personid);
-        foreach (Photo ph in personPhotos)
-        {
-          BioService.Photo currentPersonProto = _convertor.GetPhotoProto(ph);
-          if (currentPersonProto != null)
-            protoPerson.Photos.Add(currentPersonProto);
-        }
-          */
+  
 
         IQueryable<Card> personCards = cards.Where(x => x.Person_Id == personid);
         foreach (Card card in personCards)
