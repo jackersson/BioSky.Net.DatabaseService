@@ -8,12 +8,15 @@ namespace BioData.DataHolders.DataClient
 {
   public class PersonDataClient
   {
-    public PersonDataClient(IProcessorLocator locator, PhotoDataClient photoDataClient)
+    public PersonDataClient( IProcessorLocator locator, PhotoDataClient photoDataClient
+                           , CardDataClient cardDataClient)
     {
-      _locator = locator;
-      _convertor = new ProtoMessageConvertor();
+      _locator    = locator;
+      _convertor  = new ProtoMessageConvertor();
+      _rawIndexes = new BioService.RawIndexes();
 
       _photoDataClient = photoDataClient;
+      _cardDataClient  = cardDataClient;
     }
 
     public BioService.Person Update(BioService.Person person)
@@ -35,13 +38,78 @@ namespace BioData.DataHolders.DataClient
         Person existingPerson = dataContext.Person.Find(person.Id);
 
         if (existingPerson == null)
-          return updatedProtoPerson;
+          return updatedProtoPerson;        
 
         if (person.Firstname != "")
-          existingPerson.First_Name_ = person.Firstname;
+          existingPerson.First_Name_ = person.Firstname;        
 
         if (person.Lastname != "")
           existingPerson.Last_Name_ = person.Lastname;
+
+        if(person.Dateofbirth != 0)
+        {
+          DateTime dateofbirth = (person.Dateofbirth != -1)? new DateTime(person.Dateofbirth): new DateTime();
+          if (existingPerson.Date_Of_Birth != dateofbirth)
+            existingPerson.Date_Of_Birth = dateofbirth;
+        }
+
+        if (person.Country != "")
+          existingPerson.Country = (person.Country != "(Deleted)") ? person.Country : "";
+
+        if (person.City != "")
+          existingPerson.City = (person.City != "(Deleted)") ? person.City : "";
+
+        if (person.Email != "")
+          existingPerson.Email = (person.Email != "(Deleted)") ? person.Email : "";
+
+        if (person.Comments != "")
+          existingPerson.Comments = (person.Comments != "(Deleted)") ? person.Comments : "";
+
+        byte gender = (byte)person.Gender;
+        if (existingPerson.Gender != gender)
+          existingPerson.Gender = gender;
+
+        byte rights = (byte)person.Rights;
+        if (existingPerson.Rights != rights)
+          existingPerson.Rights = (byte)person.Rights;
+
+        BioService.Photo currentPhoto = person.Thumbnail;
+
+        if (currentPhoto != null)
+        {
+          Photo existingPhoto = existingPerson.PhotoCollection.Where(x => x.Id == currentPhoto.Id).FirstOrDefault();          
+
+          if (existingPhoto == null)
+          {
+            BioService.Photo insertedPhoto = _photoDataClient.Add(currentPhoto, dataContext);
+
+            if (insertedPhoto.Dbresult != BioService.Result.Success)
+            {
+              updatedProtoPerson.Thumbnail = new BioService.Photo()
+              {   Id       = insertedPhoto.Id
+                , PhotoUrl = insertedPhoto.PhotoUrl
+                , Dbresult = insertedPhoto.Dbresult
+              }; ;
+              return updatedProtoPerson;
+            }                
+
+            existingPhoto = existingPerson.PhotoCollection.Where(x => x.Id == insertedPhoto.Id).FirstOrDefault();
+          }
+
+          existingPerson.Photo_Id = existingPhoto.Id;
+          updatedProtoPerson.Thumbnail = new BioService.Photo()
+          { Id = existingPhoto.Id
+          , PhotoUrl = existingPhoto.Photo_Url
+          , Dbresult = BioService.Result.Success };
+
+          BioService.Response response = SetThumbnail(currentPhoto, dataContext);
+
+          if(response.Good != BioService.Result.Success)
+          {
+            updatedProtoPerson.Thumbnail.Dbresult = response.Good;
+            return updatedProtoPerson;
+          }          
+        }
 
         int affectedRows = dataContext.SaveChanges();
 
@@ -52,6 +120,27 @@ namespace BioData.DataHolders.DataClient
 
           if (person.Lastname != "")
             updatedProtoPerson.Lastname = person.Lastname;
+
+          if (person.Dateofbirth != 0)
+            updatedProtoPerson.Dateofbirth = (person.Dateofbirth == -1)? 0 : person.Dateofbirth;
+
+          if (person.Country != "")
+            existingPerson.Country = (person.Country != "(Deleted)") ? person.Country : "";
+
+          if (person.City != "")
+            updatedProtoPerson.City = (person.City != "(Deleted)") ? person.City : "";
+
+          if (person.Email != "")
+            updatedProtoPerson.Email = (person.Email != "(Deleted)") ? person.Email : "";
+
+          if (person.Comments != "")
+            updatedProtoPerson.Comments = (person.Comments != "(Deleted)") ? person.Comments : "";
+
+          if (existingPerson.Gender != gender)
+            updatedProtoPerson.Gender = person.Gender;
+
+          if (existingPerson.Rights != rights)
+            updatedProtoPerson.Rights = person.Rights;
 
           updatedProtoPerson.Dbresult = BioService.Result.Success;
         }
@@ -136,11 +225,37 @@ namespace BioData.DataHolders.DataClient
      
       try
       {
+
+
         Person deletePerson = dataContext.Person.Find(person.Id);
         if (deletePerson == null)
           return deletedProtoPerson;
 
+        //Photo
+        _rawIndexes.Indexes.Clear();
+        
+        foreach (Photo photo in deletePerson.PhotoCollection)
+          _rawIndexes.Indexes.Add(photo.Id);
+
+        deletePerson.Photo_Id = null;
+        deletePerson.PhotoCollection.Clear();
+        dataContext.SaveChanges();
+        
+        BioService.RawIndexes photoIndexes = _photoDataClient.Remove(_rawIndexes);
+
+        //Cards
+        _rawIndexes.Indexes.Clear();
+
+        foreach (Card card in deletePerson.Card)
+          _rawIndexes.Indexes.Add(card.Id);
+
+        deletePerson.Card.Clear();
+        dataContext.SaveChanges();
+
+        BioService.RawIndexes cardIndexes = _cardDataClient.Remove(_rawIndexes);
+
         dataContext.Person.Remove(deletePerson);
+        //
 
         int affectedRows = dataContext.SaveChanges();
 
@@ -148,6 +263,16 @@ namespace BioData.DataHolders.DataClient
         {
           deletedProtoPerson.Id = deletePerson.Id;
           deletedProtoPerson.Dbresult = BioService.Result.Success;
+          foreach (long cardId in cardIndexes.Indexes)
+          {
+            BioService.Card card = new BioService.Card() { Id = cardId };
+            deletedProtoPerson.Cards.Add(card);
+          }
+          foreach (long photoID in photoIndexes.Indexes)
+          {
+            BioService.Photo photo = new BioService.Photo() { Id = photoID };
+            deletedProtoPerson.Photos.Add(photo);
+          }
         }
       }
       catch (Exception ex)
@@ -192,19 +317,19 @@ namespace BioData.DataHolders.DataClient
       BioService.Response response = new BioService.Response() { Good = BioService.Result.Failed };
       if (item == null)
         return response;
-     
+
       try
       {
         Person owner = dataContext.Person.Where(x => x.Id == item.Personid).FirstOrDefault();
-      
+
         if (owner == null)
           return response;
-      
+
         Photo existingPhoto = owner.PhotoCollection.Where(x => x.Id == item.Id).FirstOrDefault();
-      
-        if (existingPhoto == null)
-          return response;
-      
+
+        if (existingPhoto == null)        
+          return response;       
+
         owner.Photo = existingPhoto;
       
         dataContext.SaveChanges();      
@@ -226,8 +351,10 @@ namespace BioData.DataHolders.DataClient
       }     
     }
 
-    private IProcessorLocator     _locator ;
-    private ProtoMessageConvertor _convertor;
+    private IProcessorLocator        _locator        ;
+    private ProtoMessageConvertor    _convertor      ;
     private readonly PhotoDataClient _photoDataClient;
+    private BioService.RawIndexes    _rawIndexes     ;
+    private readonly CardDataClient  _cardDataClient ;
   }
 }

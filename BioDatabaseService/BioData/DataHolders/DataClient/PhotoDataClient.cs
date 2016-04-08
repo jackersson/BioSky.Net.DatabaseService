@@ -85,9 +85,18 @@ namespace BioData.DataHolders.DataClient
         if (existingPhotos == null)
           return removedItems;
 
-        var deletedCards = dataContext.Photo.RemoveRange(existingPhotos);
+        foreach (Photo photo in existingPhotos)
+        {
+          photo.Person_Id = null;
+          photo.Portrait_Characteristics_Id = null;
+        }
+
+        dataContext.SaveChanges();
+     
+
+        var deletedPhotos = dataContext.Photo.RemoveRange(existingPhotos);
         int affectedRows = dataContext.SaveChanges();
-        if (deletedCards.Count() == affectedRows)
+        if (deletedPhotos.Count() == affectedRows)
           return items;
         else
         {
@@ -118,7 +127,7 @@ namespace BioData.DataHolders.DataClient
     public BioService.PhotoList Select(BioService.QueryPhoto query, BioSkyNetDataModel dataContext)
     {
       BioService.PhotoList photos = new BioService.PhotoList();
-
+      
       using (var DataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
       {
         try
@@ -126,7 +135,7 @@ namespace BioData.DataHolders.DataClient
           IQueryable<Photo> photoEtities = DataContext.Photo;
           foreach (Photo p in photoEtities)
           {
-            BioService.Photo protoPhoto = _convertor.GetPhotoProto(p);
+            BioService.Photo protoPhoto = _convertor.GetPhotoProto(p);      
             if (protoPhoto != null)
               photos.Photos.Add(protoPhoto);
           }

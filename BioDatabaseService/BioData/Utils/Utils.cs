@@ -7,7 +7,7 @@ namespace BioData.Utils
     {
         public string LocalStorage
         {
-            get { return "F:\\Biometric Software\\Client\\"; }
+            get { return "D:\\Spark\\Client\\"; }
         }
 
         public Google.Protobuf.ByteString GetFileDescription( string path )
