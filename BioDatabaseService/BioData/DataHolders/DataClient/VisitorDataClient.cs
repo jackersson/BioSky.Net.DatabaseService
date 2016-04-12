@@ -17,6 +17,47 @@ namespace BioData.DataHolders.DataClient
       _convertor = new ProtoMessageConvertor();
     }
 
+    public BioService.Visitor Add(BioService.Visitor visitor)
+    {
+      using (var dataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
+      {
+        return Add(visitor, dataContext);
+      }
+    }
+
+    public BioService.Visitor Add(BioService.Visitor visitor, BioSkyNetDataModel dataContext)
+    {
+      BioService.Visitor newProtoVisitor = new BioService.Visitor { Dbresult = BioService.Result.Failed };
+      
+      if (visitor == null )
+        return newProtoVisitor;
+
+      try
+      {
+        Visitor existingVisitor = dataContext.Visitor.Where(x => x.Id == visitor.Id).FirstOrDefault();
+
+        if (existingVisitor != null)
+          return newProtoVisitor;
+
+
+        Visitor newVisitor = _convertor.GetVisitorEntity(visitor);
+        dataContext.Visitor.Add(newVisitor);
+        int affectedRows = dataContext.SaveChanges();
+        if (affectedRows <= 0)
+          return newProtoVisitor;
+
+        newProtoVisitor.Dbresult = BioService.Result.Success;
+        newProtoVisitor.Id       = newVisitor.Id;
+
+        return newProtoVisitor;
+      }
+      catch (Exception ex) {
+        Console.WriteLine(ex.Message);
+      }
+
+      return newProtoVisitor;
+    }
+
     public BioService.VisitorList Select(BioService.QueryVisitors query, BioSkyNetDataModel dataContext)
     {
       BioService.VisitorList visitors = new BioService.VisitorList();

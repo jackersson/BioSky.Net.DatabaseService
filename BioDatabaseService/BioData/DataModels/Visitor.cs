@@ -15,7 +15,7 @@ namespace BioData.DataModels
         public long? Person_ID { get; set; }
 
         [Column("Full Photo Id")]
-        public long Full_Photo_Id { get; set; }
+        public long? Full_Photo_Id { get; set; }
 
         [Column("Detection Time")]
         public DateTime Detection_Time { get; set; }

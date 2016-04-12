@@ -79,6 +79,11 @@ namespace BioGrpc
       throw new NotImplementedException();
     }
 
+    public Task<Visitor> AddVisitor(Visitor request, ServerCallContext context)
+    {
+      return Task.FromResult(_database.VisitorsDataClient.Add(request));
+    }
+
     public Task<RawIndexes> RemoveVisitors(RawIndexes request, ServerCallContext context)
     {
       return Task.FromResult(_database.VisitorsDataClient.Remove(request));
@@ -103,5 +108,7 @@ namespace BioGrpc
     {
       return Task.FromResult(_database.LocationsDataClient.Remove(request));
     }
+
+    
   }
 }

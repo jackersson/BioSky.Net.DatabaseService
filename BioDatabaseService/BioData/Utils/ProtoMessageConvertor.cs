@@ -269,7 +269,7 @@ namespace BioData.Utils
         return null;
 
       Visitor entity = new Visitor();
-
+      if (proto.Id > 0)
       entity.Id = proto.Id;
       entity.Location_Id = proto.Locationid;
       entity.Detection_Time = new DateTime(proto.Time);
