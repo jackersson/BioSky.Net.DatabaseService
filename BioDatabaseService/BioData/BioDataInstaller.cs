@@ -1,6 +1,5 @@
 ﻿using BioContracts;
-using BioData.DataHolders;
-using BioData.DataHolders.Grouped;
+
 using BioData.DataModels;
 using BioData.Utils;
 using Castle.Facilities.TypedFactory;
@@ -18,9 +17,10 @@ namespace BioData
                .ImplementedBy<BioConnectionBuilder>()
                .DependsOn(new
                {
-                 dbConnectionstring = @"D:\Spark\DataBase\BioDatabaseService\database\BioSkyNet.mdf"                                    
-                 //dbConnectionstring = @"F:\Biometric Software\BioSky.Net.DatabaseService\BioDatabaseService\database\BioSkyNet.mdf"
-                 //dbConnectionstring = @"D:\BioDatabaseService\database\BioSkyNet.mdf"
+                 dbConnectionstring = @"F:\Biometric Software\BioSky.Net.DatabaseService\BioDatabaseService\database\BioSkyNet.mdf"         
+
+                 // Sasha @"D:\Spark\DataBase\BioDatabaseService\database\BioSkyNet.mdf"
+                 // Taras @"F:\Biometric Software\BioSky.Net.DatabaseService\BioDatabaseService\database\BioSkyNet.mdf"
                })
                  .LifestyleSingleton()
                );
@@ -29,20 +29,7 @@ namespace BioData
                .Register(Component.For<IContextFactory>().AsFactory());
 
       container.Register(Component.For<BioSkyNetDataModel>().LifestyleTransient());
-
-      container.Register(Component.For<PersonDataHolder>());
-      container.Register(Component.For<PhotoDataHolder>());
-
-      container.Register(Component.For<VisitorDataHolder>());
-      container.Register(Component.For<AccessDeviceDataHolder>());
-      container.Register(Component.For<CaptureDeviceDataHolder>());
-
-      container.Register(Component.For<LocationDataHolder>());
-      container.Register(Component.For<CardDataHolder>());
-
-      container.Register(Component.For<FullPersonHolder> ());
-      container.Register(Component.For<FullVisitorHolder>());
-
+            
       container.Register(Component.For<BioSkyNetRepository>());
 
       

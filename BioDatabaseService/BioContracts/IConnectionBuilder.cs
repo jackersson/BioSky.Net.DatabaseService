@@ -1,8 +1,7 @@
 ﻿namespace BioContracts
 {
-
   public interface IConnectionBuilder
   {
-    string create();    
+    string Create();    
   }
 }

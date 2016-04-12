@@ -2,12 +2,9 @@
 using BioData.DataModels;
 using BioData.Utils;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace BioData.DataHolders.DataClient
+namespace BioData.DataClients
 {
   public class VisitorDataClient
   {
@@ -119,7 +116,8 @@ namespace BioData.DataHolders.DataClient
           if(visitor.Croped_Photo_Id.HasValue)
             _rawPhotoIndexes.Indexes.Add(visitor.Croped_Photo_Id.Value);
 
-          _rawPhotoIndexes.Indexes.Add(visitor.Full_Photo_Id);
+          if (visitor.Full_Photo_Id.HasValue)
+            _rawPhotoIndexes.Indexes.Add(visitor.Full_Photo_Id.Value);
 
           visitor.Croped_Photo_Id = null;
           visitor.Full_Photo_Id = -1;

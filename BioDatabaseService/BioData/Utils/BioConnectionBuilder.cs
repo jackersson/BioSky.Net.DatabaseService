@@ -11,7 +11,7 @@ namespace BioData.Utils
       _dbConnectionstring = dbConnectionstring;
     }
 
-    public string create()
+    public string Create()
     {
       string datasource = @"data source=(LocalDB)\MSSQLLocalDB;";
 

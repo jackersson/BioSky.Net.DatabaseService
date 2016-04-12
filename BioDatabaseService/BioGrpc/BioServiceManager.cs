@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BioGrpc
 {
   using BioContracts;
-  //using BioData;
   using BioService;
   using Grpc.Core;
 
-  
-    public class ServiceConfiguration : IServiceConfiguration
+
+  public class ServiceConfiguration : IServiceConfiguration
     {
       public ServiceConfiguration(string ipAddress)
       {

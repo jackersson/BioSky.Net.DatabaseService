@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BioData.DataHolders.DataClient
+namespace BioData.DataClients
 {
   public class LocationDataClient
   {

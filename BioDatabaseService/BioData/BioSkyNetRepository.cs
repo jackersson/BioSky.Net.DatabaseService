@@ -1,83 +1,35 @@
 ﻿using BioContracts;
-using BioData.DataHolders;
-using BioData.DataHolders.DataClient;
-using BioData.DataHolders.Grouped;
-using BioData.DataModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BioData.DataClients;
 
 namespace BioData
 {
   public class BioSkyNetRepository
   {
-   // private readonly IContextFactory _contextFactory;
-    //private BioSkyNetDataModel _bioSkyNetContext;
-    private readonly IProcessorLocator _locator;
-
-    public BioSkyNetRepository( IProcessorLocator locator   )
+    public BioSkyNetRepository( IProcessorLocator locator )
     {
-      _locator = locator;
-      //if (contextFactory == null)
-      // throw new ArgumentNullException("entityFrameworkContextFactory");
-
-      // _contextFactory = contextFactory;
-
-      //InitializeContext();  
+      _locator = locator;  
       
       CardsDataClient  = new CardDataClient(locator);
       PhotosDataClient = new PhotoDataClient(locator);
 
-      AccessDeviceDataClient  acdt = new AccessDeviceDataClient (locator);
-      CaptureDeviceDataClient cddt = new CaptureDeviceDataClient(locator);
-      PersonAccessDataClient  padt = new PersonAccessDataClient (locator);
+      AccessDeviceDataClient  accessDeviceDataClient  = new AccessDeviceDataClient (locator);
+      CaptureDeviceDataClient captureDeviceDataClient = new CaptureDeviceDataClient(locator);
+      PersonAccessDataClient  personAccessDataClient  = new PersonAccessDataClient (locator);
 
       VisitorsDataClient  = new VisitorDataClient(locator);
-      LocationsDataClient = new LocationDataClient(locator, acdt, cddt, padt, VisitorsDataClient);
+      LocationsDataClient = new LocationDataClient(locator, accessDeviceDataClient, captureDeviceDataClient, personAccessDataClient, VisitorsDataClient);
 
-      PDataClient = new PersonDataClient(locator, PhotosDataClient, CardsDataClient);
-      //_photos        = new PhotoDataHolder(locator);
-
-      // _fullPersons   = new FullPersonHolder(locator);
-      //_fullVisitors  = new FullVisitorHolder(locator);
-      //_fullLocations = new FullLocationHolder(locator);
-    }
+      PersonDataClient = new PersonDataClient(locator, PhotosDataClient, CardsDataClient);
    
-
-  
-    /*
-    public PhotoDataHolder Photos()
-    {
-      return _photos;
-    }
-
-    public FullPersonHolder FullPersons()
-    {
-      return _fullPersons;
-    }
-
-    public FullVisitorHolder FullVisitors()
-    {
-      return _fullVisitors;
-    }
-
-    public FullLocationHolder FullLocations()
-    {
-      return _fullLocations;
-    }
+    }  
     
-    private readonly PhotoDataHolder _photos;
 
-    private readonly FullPersonHolder   _fullPersons  ;
-    private readonly FullVisitorHolder  _fullVisitors ;
-    private readonly FullLocationHolder _fullLocations;*/
-
-    public PersonDataClient   PDataClient       ;
-    public CardDataClient     CardsDataClient   ;
-    public PhotoDataClient    PhotosDataClient  ;
+    public PersonDataClient   PersonDataClient   ;
+    public CardDataClient     CardsDataClient    ;
+    public PhotoDataClient    PhotosDataClient   ;
     public LocationDataClient LocationsDataClient;
     public VisitorDataClient  VisitorsDataClient ;
+
+    private readonly IProcessorLocator _locator;
   }
 }
