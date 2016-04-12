@@ -80,6 +80,9 @@ namespace BioData.DataHolders.DataClient
         if (existingItems == null)
           return removedItems;
 
+        foreach(CaptureDevice captureDevice in existingItems)        
+          captureDevice.Location_Id = null;        
+
         var deletedItems = dataContext.CaptureDevice.RemoveRange(existingItems);
         int affectedRows = dataContext.SaveChanges();
         if (deletedItems.Count() == affectedRows)

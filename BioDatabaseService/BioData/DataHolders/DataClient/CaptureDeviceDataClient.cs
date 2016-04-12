@@ -41,7 +41,7 @@ namespace BioData.DataHolders.DataClient
           foreach (CaptureDevice cp in existingLocation.CaptureDevice)          
             items.Indexes.Add(cp.Id);
 
-          Remove(items);
+          Remove(items, dataContext);
         }
         
         existingLocation.CaptureDevice.Add(existingCaptureDevice);    
@@ -77,6 +77,9 @@ namespace BioData.DataHolders.DataClient
 
         if (existingItems == null)
           return removedItems;
+
+        foreach(CaptureDevice captureDevice in existingItems)        
+          captureDevice.Location_Id = null;
 
         var deletedItems = dataContext.CaptureDevice.RemoveRange(existingItems);
         int affectedRows = dataContext.SaveChanges();

@@ -96,13 +96,16 @@ namespace BioData.DataHolders.DataClient
             existingPhoto = existingPerson.PhotoCollection.Where(x => x.Id == insertedPhoto.Id).FirstOrDefault();
           }
 
-          existingPerson.Photo_Id = existingPhoto.Id;
+          existingPerson.Photo_Id      = existingPhoto.Id;
+          updatedProtoPerson.Photoid   = existingPhoto.Id;
           updatedProtoPerson.Thumbnail = new BioService.Photo()
           { Id = existingPhoto.Id
           , PhotoUrl = existingPhoto.Photo_Url
           , Dbresult = BioService.Result.Success };
 
-          BioService.Response response = SetThumbnail(currentPhoto, dataContext);
+          BioService.Photo thumbnailPhoto = new BioService.Photo() { Id = existingPhoto.Id, Personid = existingPhoto.Person_Id.Value };
+
+          BioService.Response response = SetThumbnail(thumbnailPhoto, dataContext);
 
           if(response.Good != BioService.Result.Success)
           {
@@ -110,40 +113,41 @@ namespace BioData.DataHolders.DataClient
             return updatedProtoPerson;
           }          
         }
-
-        int affectedRows = dataContext.SaveChanges();
-
-        if (affectedRows > 0)
+        else
         {
-          if (person.Firstname != "")
-            updatedProtoPerson.Firstname = person.Firstname;
-
-          if (person.Lastname != "")
-            updatedProtoPerson.Lastname = person.Lastname;
-
-          if (person.Dateofbirth != 0)
-            updatedProtoPerson.Dateofbirth = (person.Dateofbirth == -1)? 0 : person.Dateofbirth;
-
-          if (person.Country != "")
-            existingPerson.Country = (person.Country != "(Deleted)") ? person.Country : "";
-
-          if (person.City != "")
-            updatedProtoPerson.City = (person.City != "(Deleted)") ? person.City : "";
-
-          if (person.Email != "")
-            updatedProtoPerson.Email = (person.Email != "(Deleted)") ? person.Email : "";
-
-          if (person.Comments != "")
-            updatedProtoPerson.Comments = (person.Comments != "(Deleted)") ? person.Comments : "";
-
-          if (existingPerson.Gender != gender)
-            updatedProtoPerson.Gender = person.Gender;
-
-          if (existingPerson.Rights != rights)
-            updatedProtoPerson.Rights = person.Rights;
-
-          updatedProtoPerson.Dbresult = BioService.Result.Success;
+          int affectedRows  = dataContext.SaveChanges();
+          if (affectedRows <= 0)
+            return updatedProtoPerson;
         }
+
+        if (person.Firstname != "")
+          updatedProtoPerson.Firstname = person.Firstname;
+
+        if (person.Lastname != "")
+          updatedProtoPerson.Lastname = person.Lastname;
+
+        if (person.Dateofbirth != 0)
+          updatedProtoPerson.Dateofbirth = (person.Dateofbirth == -1) ? 0 : person.Dateofbirth;
+
+        if (person.Country != "")
+          existingPerson.Country = (person.Country != "(Deleted)") ? person.Country : "(Deleted)";
+
+        if (person.City != "")
+          updatedProtoPerson.City = (person.City != "(Deleted)") ? person.City : "(Deleted)";
+
+        if (person.Email != "")
+          updatedProtoPerson.Email = (person.Email != "(Deleted)") ? person.Email : "(Deleted)";
+
+        if (person.Comments != "")
+          updatedProtoPerson.Comments = (person.Comments != "(Deleted)") ? person.Comments : "(Deleted)";
+
+        if (existingPerson.Gender != gender)
+          updatedProtoPerson.Gender = person.Gender;
+
+        if (existingPerson.Rights != rights)
+          updatedProtoPerson.Rights = person.Rights;
+
+        updatedProtoPerson.Dbresult = BioService.Result.Success;
       }
       catch (Exception ex) {
         Console.WriteLine(ex.Message);

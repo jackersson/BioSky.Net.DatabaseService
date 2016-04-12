@@ -34,8 +34,8 @@ namespace BioData
       CaptureDeviceDataClient cddt = new CaptureDeviceDataClient(locator);
       PersonAccessDataClient  padt = new PersonAccessDataClient (locator);
 
-      LocationsDataClient  = new LocationDataClient(locator, acdt, cddt, padt);
-      VisitorsDataClient   = new VisitorDataClient(locator);
+      VisitorsDataClient  = new VisitorDataClient(locator);
+      LocationsDataClient = new LocationDataClient(locator, acdt, cddt, padt, VisitorsDataClient);
 
       PDataClient = new PersonDataClient(locator, PhotosDataClient, CardsDataClient);
       //_photos        = new PhotoDataHolder(locator);
