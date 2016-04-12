@@ -13,8 +13,9 @@ namespace BioData.DataHolders.DataClient
   {
     public VisitorDataClient(IProcessorLocator locator)
     {
-      _locator   = locator;
-      _convertor = new ProtoMessageConvertor();
+      _locator         = locator;
+      _convertor       = new ProtoMessageConvertor();
+      _rawPhotoIndexes = new BioService.RawIndexes();
     }
 
     public BioService.Visitor Add(BioService.Visitor visitor)
@@ -107,6 +108,25 @@ namespace BioData.DataHolders.DataClient
 
         if (existingVisitors == null)
           return removedItems;
+        
+        _rawPhotoIndexes.Indexes.Clear();
+
+        foreach (Visitor visitor in existingVisitors)
+        {
+          visitor.Person_ID = null;
+          visitor.Location_Id = -1;
+
+          if(visitor.Croped_Photo_Id.HasValue)
+            _rawPhotoIndexes.Indexes.Add(visitor.Croped_Photo_Id.Value);
+
+          _rawPhotoIndexes.Indexes.Add(visitor.Full_Photo_Id);
+
+          visitor.Croped_Photo_Id = null;
+          visitor.Full_Photo_Id = -1;
+        }
+
+        BioService.RawIndexes photoIndexes = _photoDataClient.Remove(_rawPhotoIndexes);
+
 
         var deletedLocations = dataContext.Visitor.RemoveRange(existingVisitors);
         int affectedRows = dataContext.SaveChanges();
@@ -131,5 +151,8 @@ namespace BioData.DataHolders.DataClient
     private IProcessorLocator        _locator        ;
     private ProtoMessageConvertor    _convertor      ;
     private readonly PhotoDataClient _photoDataClient;
+    private BioService.RawIndexes    _rawPhotoIndexes;
+
+
   }
 }

@@ -7,11 +7,6 @@ using Castle.Facilities.TypedFactory;
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BioData
 {
@@ -23,8 +18,9 @@ namespace BioData
                .ImplementedBy<BioConnectionBuilder>()
                .DependsOn(new
                {
-                   dbConnectionstring = @"F:\Biometric Software\BioSky.Net.DatabaseService\BioDatabaseService\database\BioSkyNet.mdf"
-                   //dbConnectionstring = @"D:\BioDatabaseService\database\BioSkyNet.mdf"
+                 dbConnectionstring = @"D:\Spark\DataBase\BioDatabaseService\database\BioSkyNet.mdf"                                    
+                 //dbConnectionstring = @"F:\Biometric Software\BioSky.Net.DatabaseService\BioDatabaseService\database\BioSkyNet.mdf"
+                 //dbConnectionstring = @"D:\BioDatabaseService\database\BioSkyNet.mdf"
                })
                  .LifestyleSingleton()
                );

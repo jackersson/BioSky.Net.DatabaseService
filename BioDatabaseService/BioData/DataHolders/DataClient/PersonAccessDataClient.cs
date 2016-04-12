@@ -16,7 +16,7 @@ namespace BioData.DataHolders.DataClient
       _convertor = new ProtoMessageConvertor();
     }
        
-    public RepeatedField<BioService.Person> Add(Location existingLocation, BioService.Location item, BioSkyNetDataModel dataContext)
+    public RepeatedField<BioService.Person> Update(Location existingLocation, BioService.Location item, BioSkyNetDataModel dataContext)
     {
       RepeatedField<BioService.Person > newProtoLocation = new RepeatedField<BioService.Person>();
       if (item == null )
