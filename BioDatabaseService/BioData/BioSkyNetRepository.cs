@@ -3,7 +3,7 @@ using BioData.DataClients;
 
 namespace BioData
 {
-  //test
+
   public class BioSkyNetRepository
   {
     public BioSkyNetRepository( IProcessorLocator locator )
@@ -20,8 +20,7 @@ namespace BioData
       VisitorsDataClient  = new VisitorDataClient(locator);
       LocationsDataClient = new LocationDataClient(locator, accessDeviceDataClient, captureDeviceDataClient, personAccessDataClient, VisitorsDataClient);
 
-      PersonDataClient = new PersonDataClient(locator, PhotosDataClient, CardsDataClient);
-   
+      PersonDataClient = new PersonDataClient(locator, PhotosDataClient, CardsDataClient);   
     }  
     
 
