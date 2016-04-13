@@ -168,13 +168,19 @@ namespace BioData.DataHolders.DataClient
           }
         }
 
-        RepeatedField<BioService.Person> results = _personAccessDataClient.Update(existingLocation, location, dataContext);
-        if (results.Count > 0)
+        if(location.EntityState == BioService.EntityState.Modified)
         {
-          updatedProtoLocation.Persons.Add(results);
-          updatedProtoLocation.Dbresult = BioService.Result.Success;
+          RepeatedField<BioService.Person> results = _personAccessDataClient.Update(existingLocation, location, dataContext);
+          if (results.Count > 0)
+          {
+            updatedProtoLocation.Persons.Add(results);
+            updatedProtoLocation.Dbresult = BioService.Result.Success;
+          }
+          updatedProtoLocation.AccessType = location.AccessType;
         }
-        updatedProtoLocation.Id = location.Id;
+        updatedProtoLocation.Id          = location.Id;
+        updatedProtoLocation.EntityState = location.EntityState;
+
       }
       catch (Exception ex) {
         Console.WriteLine(ex.Message);
@@ -204,65 +210,60 @@ namespace BioData.DataHolders.DataClient
         if (existingLocations == null)
           return removedItems;
 
-        _rawIndexes.Indexes.Clear();
-        _accessDevicesRawIndexes.Indexes.Clear();
+        _rawIndexes              .Indexes.Clear();
+        _accessDevicesRawIndexes .Indexes.Clear();
         _caprureDevicesRawIndexes.Indexes.Clear();
-        _visitorsRawIndexes.Indexes.Clear();
+        _visitorsRawIndexes      .Indexes.Clear();
 
-        foreach (Location location in existingLocations)
-        {
-          //AccessDevice
-          foreach (AccessDevice accessDevice in location.AccessDevice)
-            _accessDevicesRawIndexes.Indexes.Add(accessDevice.Id);
+        Location location = existingLocations.FirstOrDefault();
 
-          location.AccessDevice.Clear();
-          //CaptureDevice
-          foreach (CaptureDevice captureDevice in location.CaptureDevice)
-            _caprureDevicesRawIndexes.Indexes.Add(captureDevice.Id);
+        if (location == null)
+          return removedItems;
 
-          location.CaptureDevice.Clear();
-          //PersonAccess
+        //AccessDevice
+        foreach (AccessDevice accessDevice in location.AccessDevice)
+          _accessDevicesRawIndexes.Indexes.Add(accessDevice.Id);
 
-          location.Access_Map_Id = null;
-          location.PersonAccess = null;
-          location.PersonAccessCollection.Clear();
+        location.AccessDevice.Clear();
 
-          _rawIndexes.Indexes.Add(location.Id);
-            //Visitors
-          
-          foreach (Visitor visitor in location.Visitor)
-            _visitorsRawIndexes.Indexes.Add(visitor.Id);
+        //CaptureDevice
+        foreach (CaptureDevice captureDevice in location.CaptureDevice)
+          _caprureDevicesRawIndexes.Indexes.Add(captureDevice.Id);
 
-          location.Visitor.Clear();
-        }
+        location.CaptureDevice.Clear();   
+
+        //PersonAccess
+        location.Access_Map_Id = null;
+        location.PersonAccess  = null;
+        _rawIndexes.Indexes.Add(location.Id);
+
+        //Visitors
+        foreach (Visitor visitor in location.Visitor)
+          _visitorsRawIndexes.Indexes.Add(visitor.Id);
+
+        location.Visitor.Clear();        
 
         dataContext.SaveChanges();
-        
-        foreach(long id in _rawIndexes.Indexes)
+
+        foreach (long id in _rawIndexes.Indexes)
         {
           BioService.Location locationItem = new BioService.Location()
           {
-            Id = id
-,
-            AccessType = BioService.Location.Types.AccessType.None
+              Id = id
+            , AccessType = BioService.Location.Types.AccessType.None
           };
 
-          Location location = existingLocations.Where(x => x.Id == id).FirstOrDefault();
-          
-          if(location != null)
-            _personAccessDataClient.Update(location, locationItem, dataContext);
+          Location currenLocation = existingLocations.Where(x => x.Id == id).FirstOrDefault();
+          if (location != null)
+            _personAccessDataClient.Update(currenLocation, locationItem, dataContext);
         }
 
-
-        BioService.RawIndexes accessDeviceIndexes  = _accessDeviceDataClient.Remove(_accessDevicesRawIndexes);
+        BioService.RawIndexes accessDeviceIndexes = _accessDeviceDataClient.Remove(_accessDevicesRawIndexes);
         BioService.RawIndexes captureDeviceIndexes = _captureDeviceDataClient.Remove(_caprureDevicesRawIndexes);
-        BioService.RawIndexes visitorsIndexes      = _visitorDataClient.Remove(_visitorsRawIndexes);
-
-
-
+        BioService.RawIndexes visitorsIndexes = _visitorDataClient.Remove(_visitorsRawIndexes);
 
         var deletedLocations = dataContext.Location.RemoveRange(existingLocations);
-        int affectedRows     = dataContext.SaveChanges();
+        int affectedRows = dataContext.SaveChanges();
         if (deletedLocations.Count() == affectedRows)
           return items;
         else
@@ -274,7 +275,8 @@ namespace BioData.DataHolders.DataClient
           }
         }
       }
-      catch (Exception ex) {
+      catch (Exception ex)
+      {
         Console.WriteLine(ex.Message);
       }
 

@@ -26,44 +26,35 @@ namespace BioData.DataHolders.DataClient
       {
         IQueryable<PersonAccess> existingRecords = dataContext.PersonAccess.Where(x => x.Location_Id == existingLocation.Id);
      
-        if (item.AccessType == BioService.Location.Types.AccessType.None)        
-          dataContext.PersonAccess.RemoveRange(existingRecords);
-        else if (item.AccessType == BioService.Location.Types.AccessType.All)
+        if (item.AccessType == BioService.Location.Types.AccessType.Custom)
         {
-          HashSet<long> personsToAdd = new HashSet<long>();
-          foreach (PersonAccess pa in existingRecords)
-            personsToAdd.Add(pa.Person_Id);
-         
-          IQueryable<Person> persons      = dataContext.Person.Where(x => !personsToAdd.Contains(x.Id));
+          List<PersonAccess> listToAdd     = new List<PersonAccess>();
+          HashSet<long> existingItems = new HashSet<long>(existingRecords.Select(x => x.Person_Id));
+          HashSet<long> itemsToRemove = new HashSet<long>(item.Persons.Where(x => 
+                                                                             x.EntityState == BioService.EntityState.Deleted)
+                                                                             .Select( x => x.Id) );
+          HashSet<long> itemsToAdd    = new HashSet<long>(item.Persons.Where(x => 
+                                                                             x.EntityState == BioService.EntityState.Added  )
+                                                                             .Select(x => x.Id ) );
 
-          List<PersonAccess> personAccess = new List<PersonAccess>();
-          foreach (Person pp in persons)
-            personAccess.Add(new PersonAccess() { Location_Id = existingLocation.Id, Person_Id = pp.Id });
+          itemsToRemove.IntersectWith(existingItems);
+          itemsToAdd   .ExceptWith   (existingItems);
 
-          dataContext.PersonAccess.AddRange(personAccess);
-        }
-        else
-        {
-          HashSet<long>      itemsToRemove = new HashSet<long>();          
-          List<PersonAccess> itemsToAdd    = new List<PersonAccess>();
+          foreach (long id in itemsToAdd)
+          {          
+            PersonAccess pa = new PersonAccess() { Location_Id = existingLocation.Id, Person_Id = id };
+            listToAdd.Add(pa);            
+          }      
 
-          foreach (BioService.Person pp in item.Persons)
-          {
-            if (pp.EntityState == BioService.EntityState.Deleted)
-              itemsToRemove.Add(pp.Id);
-            else if (pp.EntityState == BioService.EntityState.Added)
-            {
-              PersonAccess pa = new PersonAccess() { Location_Id = existingLocation.Id, Person_Id = pp.Id };
-              itemsToAdd.Add(pa);
-            }     
-          }
+          dataContext.PersonAccess.AddRange(listToAdd);
 
-          dataContext.PersonAccess.AddRange(itemsToAdd);
           IQueryable<PersonAccess> toRemove = dataContext.PersonAccess.Where(x => x.Location_Id == existingLocation.Id 
                                                                                && itemsToRemove.Contains(x.Person_Id) );
           dataContext.PersonAccess.RemoveRange(toRemove);
         }
-        
+        else
+          dataContext.PersonAccess.RemoveRange(existingRecords);
+
         int affectedRows = dataContext.SaveChanges();
         if (affectedRows > 0)
         {
