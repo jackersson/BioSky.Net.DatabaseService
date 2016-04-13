@@ -4,17 +4,17 @@ using BioData.Utils;
 using System;
 using System.Linq;
 
-namespace BioData.DataHolders.DataClient
+namespace BioData.DataClients
 {
-  public class CaptureDeviceDataClient
+  public class AccessDeviceDataClient
   {
-    public CaptureDeviceDataClient(IProcessorLocator locator)
+    public AccessDeviceDataClient(IProcessorLocator locator)
     {
       _locator = locator;
       _convertor = new ProtoMessageConvertor();
     }
 
-    public BioService.CaptureDevice Add(Location existingLocation, BioService.CaptureDevice item)
+    public BioService.AccessDevice Add(Location existingLocation, BioService.AccessDevice item)
     {
       using (var dataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
       {
@@ -22,39 +22,41 @@ namespace BioData.DataHolders.DataClient
       }
     }
 
-    public BioService.CaptureDevice Add(Location existingLocation, BioService.CaptureDevice item, BioSkyNetDataModel dataContext)
+    public BioService.AccessDevice Add(Location existingLocation, BioService.AccessDevice item, BioSkyNetDataModel dataContext)
     {
-      BioService.CaptureDevice newProtoCaptureDevice = new BioService.CaptureDevice() { };
+      BioService.AccessDevice newProtoAccessDevice = new BioService.AccessDevice() { };
       if (item == null)
-        return newProtoCaptureDevice;
+        return newProtoAccessDevice;
 
       try
       {
-        CaptureDevice existingCaptureDevice = dataContext.CaptureDevice.Where(x => x.Device_Name == item.Devicename).FirstOrDefault();
+        AccessDevice existingAccessDevice = dataContext.AccessDevice.Where(x => x.PortName == item.Portname).FirstOrDefault();
 
-        if (existingCaptureDevice == null)        
-          existingCaptureDevice = _convertor.GetCaptureDeviceEntity(item);
+        if ( existingAccessDevice == null )
+           existingAccessDevice = _convertor.GetAccessDeviceEntity(item);
 
-        if (existingLocation.CaptureDevice.Count > 0)
+
+        if (existingLocation.AccessDevice.Count > 0)
         {
           BioService.RawIndexes items = new BioService.RawIndexes();
-          foreach (CaptureDevice cp in existingLocation.CaptureDevice)          
+          foreach (AccessDevice cp in existingLocation.AccessDevice)
             items.Indexes.Add(cp.Id);
 
-          Remove(items, dataContext);
+          Remove(items);
         }
-        
-        existingLocation.CaptureDevice.Add(existingCaptureDevice);    
-        
+
+        existingLocation.AccessDevice.Add(existingAccessDevice);   
+
         int affectedRows = dataContext.SaveChanges();
-        if (affectedRows > 0)        
-          newProtoCaptureDevice.Id = existingCaptureDevice.Id;              
+        if (affectedRows > 0)
+          newProtoAccessDevice.Id = existingAccessDevice.Id;
       }
-      catch (Exception ex) {
+      catch (Exception ex)
+      {
         Console.WriteLine(ex.Message);
       }
 
-      return newProtoCaptureDevice;
+      return newProtoAccessDevice;
     }
 
     public BioService.RawIndexes Remove(BioService.RawIndexes items)
@@ -79,7 +81,7 @@ namespace BioData.DataHolders.DataClient
           return removedItems;
 
         foreach(CaptureDevice captureDevice in existingItems)        
-          captureDevice.Location_Id = null;
+          captureDevice.Location_Id = null;        
 
         var deletedItems = dataContext.CaptureDevice.RemoveRange(existingItems);
         int affectedRows = dataContext.SaveChanges();
@@ -94,7 +96,8 @@ namespace BioData.DataHolders.DataClient
           }
         }
       }
-      catch (Exception ex) {
+      catch (Exception ex)
+      {
         Console.WriteLine(ex.Message);
       }
 

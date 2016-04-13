@@ -2,12 +2,9 @@
 using BioData.DataModels;
 using BioData.Utils;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace BioData.DataHolders.DataClient
+namespace BioData.DataClients
 {
   public class VisitorDataClient
   {
@@ -16,6 +13,47 @@ namespace BioData.DataHolders.DataClient
       _locator         = locator;
       _convertor       = new ProtoMessageConvertor();
       _rawPhotoIndexes = new BioService.RawIndexes();
+    }
+
+    public BioService.Visitor Add(BioService.Visitor visitor)
+    {
+      using (var dataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
+      {
+        return Add(visitor, dataContext);
+      }
+    }
+
+    public BioService.Visitor Add(BioService.Visitor visitor, BioSkyNetDataModel dataContext)
+    {
+      BioService.Visitor newProtoVisitor = new BioService.Visitor { Dbresult = BioService.Result.Failed };
+      
+      if (visitor == null )
+        return newProtoVisitor;
+
+      try
+      {
+        Visitor existingVisitor = dataContext.Visitor.Where(x => x.Id == visitor.Id).FirstOrDefault();
+
+        if (existingVisitor != null)
+          return newProtoVisitor;
+
+
+        Visitor newVisitor = _convertor.GetVisitorEntity(visitor);
+        dataContext.Visitor.Add(newVisitor);
+        int affectedRows = dataContext.SaveChanges();
+        if (affectedRows <= 0)
+          return newProtoVisitor;
+
+        newProtoVisitor.Dbresult = BioService.Result.Success;
+        newProtoVisitor.Id       = newVisitor.Id;
+
+        return newProtoVisitor;
+      }
+      catch (Exception ex) {
+        Console.WriteLine(ex.Message);
+      }
+
+      return newProtoVisitor;
     }
 
     public BioService.VisitorList Select(BioService.QueryVisitors query, BioSkyNetDataModel dataContext)
@@ -78,7 +116,8 @@ namespace BioData.DataHolders.DataClient
           if(visitor.Croped_Photo_Id.HasValue)
             _rawPhotoIndexes.Indexes.Add(visitor.Croped_Photo_Id.Value);
 
-          _rawPhotoIndexes.Indexes.Add(visitor.Full_Photo_Id);
+          if (visitor.Full_Photo_Id.HasValue)
+            _rawPhotoIndexes.Indexes.Add(visitor.Full_Photo_Id.Value);
 
           visitor.Croped_Photo_Id = null;
           visitor.Full_Photo_Id = -1;

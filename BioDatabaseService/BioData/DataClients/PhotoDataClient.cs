@@ -4,7 +4,7 @@ using BioData.Utils;
 using System;
 using System.Linq;
 
-namespace BioData.DataHolders.DataClient
+namespace BioData.DataClients
 {
   public class PhotoDataClient
   {

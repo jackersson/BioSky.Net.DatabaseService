@@ -1,12 +1,7 @@
-﻿
-using Castle.MicroKernel.Registration;
+﻿using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BioGrpc
 {
@@ -14,13 +9,10 @@ namespace BioGrpc
   {    
     public void Install(IWindsorContainer container, IConfigurationStore store)
     {
-      try
-      {
+      try  {
         container.Register(Component.For<BioServiceManager>());
-
       }
-      catch (Exception ex)
-      {
+      catch (Exception ex) {
         Console.WriteLine("BioGrpc.dll" + ex.Message);
       }
     }

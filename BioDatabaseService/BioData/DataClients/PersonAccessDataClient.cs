@@ -6,7 +6,7 @@ using System.Linq;
 using Google.Protobuf.Collections;
 using System.Collections.Generic;
 
-namespace BioData.DataHolders.DataClient
+namespace BioData.DataClients
 {
   public class PersonAccessDataClient
   {

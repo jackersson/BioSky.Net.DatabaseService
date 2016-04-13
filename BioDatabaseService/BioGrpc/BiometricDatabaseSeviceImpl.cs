@@ -21,22 +21,22 @@ namespace BioGrpc
 
     public Task<PersonList> PersonSelect(QueryPersons request, ServerCallContext context)
     {
-      return Task.FromResult(_database.PDataClient.Select());
+      return Task.FromResult(_database.PersonDataClient.Select());
     }
 
     public Task<Person> AddPerson(Person request, ServerCallContext context)
     {
-      return Task.FromResult(_database.PDataClient.Add(request));
+      return Task.FromResult(_database.PersonDataClient.Add(request));
     }
 
     public Task<Person> UpdatePerson(Person request, ServerCallContext context)
     {
-      return Task.FromResult(_database.PDataClient.Update(request));
+      return Task.FromResult(_database.PersonDataClient.Update(request));
     }
 
     public Task<Person> RemovePerson(Person request, ServerCallContext context)
     {
-      return Task.FromResult(_database.PDataClient.Remove(request));
+      return Task.FromResult(_database.PersonDataClient.Remove(request));
     }
 
     public Task<Card> AddCard(Card request, ServerCallContext context)
@@ -66,7 +66,7 @@ namespace BioGrpc
 
     Task<Response> BiometricDatabaseSevice.IBiometricDatabaseSevice.SetThumbnail(Photo request, ServerCallContext context)
     {
-      return Task.FromResult(_database.PDataClient.SetThumbnail(request));
+      return Task.FromResult(_database.PersonDataClient.SetThumbnail(request));
     }
 
     public Task<VisitorList> SelectVisitors(QueryVisitors request, ServerCallContext context)
@@ -77,6 +77,11 @@ namespace BioGrpc
     public Task<Response> AttachVisitorToPerson(Visitor request, ServerCallContext context)
     {
       throw new NotImplementedException();
+    }
+
+    public Task<Visitor> AddVisitor(Visitor request, ServerCallContext context)
+    {
+      return Task.FromResult(_database.VisitorsDataClient.Add(request));
     }
 
     public Task<RawIndexes> RemoveVisitors(RawIndexes request, ServerCallContext context)
@@ -103,5 +108,7 @@ namespace BioGrpc
     {
       return Task.FromResult(_database.LocationsDataClient.Remove(request));
     }
+
+    
   }
 }

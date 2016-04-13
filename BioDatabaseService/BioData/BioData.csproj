@@ -108,27 +108,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataHolders\AccessDeviceDataHolder.cs" />
-    <Compile Include="DataHolders\CaptureDeviceDataHolder.cs" />
-    <Compile Include="DataHolders\CardDataHolder.cs" />
-    <Compile Include="DataHolders\DataClient\AccessDeviceDataClient.cs" />
-    <Compile Include="DataHolders\DataClient\CaptureDeviceDataClient.cs" />
-    <Compile Include="DataHolders\DataClient\CardDataClient.cs" />
-    <Compile Include="DataHolders\DataClient\LocationDataClient.cs" />
-    <Compile Include="DataHolders\DataClient\PersonAccessDataClient.cs" />
-    <Compile Include="DataHolders\DataClient\PersonDataClient.cs" />
-    <Compile Include="DataHolders\DataClient\PhotoDataClient.cs" />
-    <Compile Include="DataHolders\DataClient\VisitorDataClient.cs" />
-    <Compile Include="DataHolders\DataHolderBase.cs" />
-    <Compile Include="DataHolders\Grouped\FullLocationHolder.cs" />
-    <Compile Include="DataHolders\Grouped\FullPersonHolder.cs" />
-    <Compile Include="DataHolders\Grouped\FullVisitorHolder.cs" />
-    <Compile Include="DataHolders\LocationDataHolder.cs" />
-    <Compile Include="DataHolders\PhotoDataHolder.cs" />
-    <Compile Include="DataHolders\VisitorDataHolder.cs" />
+    <Compile Include="DataClients\AccessDeviceDataClient.cs" />
+    <Compile Include="DataClients\CaptureDeviceDataClient.cs" />
+    <Compile Include="DataClients\CardDataClient.cs" />
+    <Compile Include="DataClients\LocationDataClient.cs" />
+    <Compile Include="DataClients\PersonAccessDataClient.cs" />
+    <Compile Include="DataClients\PersonDataClient.cs" />
+    <Compile Include="DataClients\PhotoDataClient.cs" />
+    <Compile Include="DataClients\VisitorDataClient.cs" />
     <Compile Include="BioDataInstaller.cs" />
     <Compile Include="BioSkyNetRepository.cs" />
-    <Compile Include="DataHolders\PersonDataHolder.cs" />
     <Compile Include="DataModels\AccessDevice.cs" />
     <Compile Include="DataModels\BiometricLocation.cs" />
     <Compile Include="DataModels\BioSkyNetDataModel.cs" />

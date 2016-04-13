@@ -9,7 +9,7 @@ namespace BioData.DataModels
     public partial class BioSkyNetDataModel : DbContext
     {
         public BioSkyNetDataModel( IConnectionBuilder connectionBuilder) 
-                                 : base(connectionBuilder.create()) 
+                                 : base(connectionBuilder.Create()) 
 
         {
         }
