@@ -244,7 +244,7 @@ namespace BioData.Utils
         return null;
 
       BioService.Visitor proto = new BioService.Visitor();
-
+      
       proto.Id         = entity.Id;
       proto.Locationid = entity.Location_Id;
       proto.Time       = entity.Detection_Time.Ticks;
@@ -270,12 +270,14 @@ namespace BioData.Utils
 
       Visitor entity = new Visitor();
       if (proto.Id > 0)
-      entity.Id = proto.Id;
+        entity.Id = proto.Id;
+
       entity.Location_Id = proto.Locationid;
       entity.Detection_Time = new DateTime(proto.Time);
       entity.Card_Number = proto.CardNumber;
       //entity.Photo_ID  = proto.Photoid;
-      entity.Person_ID = proto.Personid;
+      if ( proto.Personid > 0)
+        entity.Person_ID = proto.Personid;
       entity.Status    = (byte)proto.Status;
       return entity;
     }

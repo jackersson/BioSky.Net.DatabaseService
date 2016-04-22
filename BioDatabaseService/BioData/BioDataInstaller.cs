@@ -17,7 +17,7 @@ namespace BioData
                .ImplementedBy<BioConnectionBuilder>()
                .DependsOn(new
                {
-                 dbConnectionstring = @"F:\Biometric Software\BioSky.Net.DatabaseService\BioDatabaseService\database\BioSkyNet.mdf"         
+                 dbConnectionstring = @"D:\Spark\DataBase\BioDatabaseService\database\BioSkyNet.mdf"
 
                  // Sasha @"D:\Spark\DataBase\BioDatabaseService\database\BioSkyNet.mdf"
                  // Taras @"F:\Biometric Software\BioSky.Net.DatabaseService\BioDatabaseService\database\BioSkyNet.mdf"

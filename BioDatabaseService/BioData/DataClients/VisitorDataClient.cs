@@ -2,7 +2,10 @@
 using BioData.DataModels;
 using BioData.Utils;
 using System;
+using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace BioData.DataClients
 {
@@ -39,6 +42,7 @@ namespace BioData.DataClients
 
 
         Visitor newVisitor = _convertor.GetVisitorEntity(visitor);
+
         dataContext.Visitor.Add(newVisitor);
         int affectedRows = dataContext.SaveChanges();
         if (affectedRows <= 0)
@@ -56,6 +60,41 @@ namespace BioData.DataClients
       return newProtoVisitor;
     }
 
+    private bool CheckQueryRequirements(Visitor item, List<Predicate<Visitor>> predicates)
+    {
+      foreach (Predicate<Visitor> predicate in predicates)
+      {
+        if (!predicate(item))
+          return false;     
+      }
+      return true;
+    }
+
+    private List<Predicate<Visitor>> GetPredicates(BioService.QueryVisitors query)
+    {
+      List<Predicate<Visitor>> predicates = new List<Predicate<Visitor>>();
+
+      if (query.Locations.Count > 0)
+        predicates.Add(item => query.Locations.Contains(item.Location_Id));
+
+      if (query.Countries.Count > 0)
+        predicates.Add(item => item.Person != null && query.Countries.Contains(item.Person.Country));
+
+      if (query.Persons.Count > 0)
+        predicates.Add(item => item.Person != null && query.Persons.Contains(item.Person.Id));
+
+      if (query.DatetimeFrom > 0)
+      {
+        DateTime dateTimeFrom = new DateTime(query.DatetimeFrom);
+        long to = query.DatetimeTo;
+        DateTime dateTimeTo = (to == 0) ? DateTime.Now : new DateTime(to);
+
+        predicates.Add(item => item.Detection_Time >= dateTimeFrom
+                            && item.Detection_Time <= dateTimeTo);
+      }
+      return predicates;
+    }
+
     public BioService.VisitorList Select(BioService.QueryVisitors query, BioSkyNetDataModel dataContext)
     {
       BioService.VisitorList visitors = new BioService.VisitorList();
@@ -63,12 +102,26 @@ namespace BioData.DataClients
       try
       {
         IQueryable<Visitor> visitorEntities = dataContext.Visitor;
-        foreach (Visitor p in visitorEntities)
+
+        List<Predicate<Visitor>> predicates = GetPredicates(query);
+        
+        List<Visitor> filteredEntities = new List<Visitor>();        
+        foreach (Visitor vs in visitorEntities)
         {
+          if (CheckQueryRequirements(vs, predicates))
+            filteredEntities.Add(vs);
+        }
+
+        if (query.ItemsPerPage > 0)
+          filteredEntities = filteredEntities.OrderByDescending(x => x.Detection_Time).Take((int)query.ItemsPerPage).ToList();
+        
+        foreach (Visitor p in filteredEntities)
+        {          
           BioService.Visitor protoVisitor = _convertor.GetVisitorProto(p);
           if (protoVisitor != null)
             visitors.Visitors.Add(protoVisitor);
-        }
+        }  
+           
       }
       catch (Exception ex)
       {
@@ -123,7 +176,11 @@ namespace BioData.DataClients
           visitor.Full_Photo_Id = -1;
         }
 
-        BioService.RawIndexes photoIndexes = _photoDataClient.Remove(_rawPhotoIndexes);
+        BioService.RawIndexes photoIndexes;
+
+        if (_rawPhotoIndexes.Indexes.Count > 0)
+          photoIndexes = _photoDataClient.Remove(_rawPhotoIndexes);
+
 
 
         var deletedLocations = dataContext.Visitor.RemoveRange(existingVisitors);

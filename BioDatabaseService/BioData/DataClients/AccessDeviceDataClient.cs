@@ -75,15 +75,15 @@ namespace BioData.DataClients
 
       try
       {
-        var existingItems = dataContext.CaptureDevice.Where(x => items.Indexes.Contains(x.Id));
+        var existingItems = dataContext.AccessDevice.Where(x => items.Indexes.Contains(x.Id));
 
         if (existingItems == null)
           return removedItems;
 
-        foreach(CaptureDevice captureDevice in existingItems)        
-          captureDevice.Location_Id = null;        
+        foreach(AccessDevice accessDevice in existingItems)
+          accessDevice.Location_Id = null;        
 
-        var deletedItems = dataContext.CaptureDevice.RemoveRange(existingItems);
+        var deletedItems = dataContext.AccessDevice.RemoveRange(existingItems);
         int affectedRows = dataContext.SaveChanges();
         if (deletedItems.Count() == affectedRows)
           return items;
@@ -91,7 +91,7 @@ namespace BioData.DataClients
         {
           foreach (long id in items.Indexes)
           {
-            if (dataContext.CaptureDevice.Find(id) == null)
+            if (dataContext.AccessDevice.Find(id) == null)
               removedItems.Indexes.Add(id);
           }
         }

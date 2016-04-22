@@ -82,10 +82,8 @@ namespace BioData.DataClients
 
         newProtoLocation.Persons.Add(_personAccessDataClient.Update(newLocation, location, dataContext));
 
-        if (newProtoLocation.Persons.Count == 0)
-          newLocation.Access_Type = (byte)BioService.Location.Types.AccessType.None;
-        else if (newProtoLocation.Persons.Count == dataContext.Person.Count())
-          newLocation.Access_Type = (byte)BioService.Location.Types.AccessType.All;
+        if (newProtoLocation.Persons.Count == 0)        
+          newLocation.Access_Type = (byte)location.AccessType;        
         else
           newLocation.Access_Type = (byte)BioService.Location.Types.AccessType.Custom;
 
@@ -147,27 +145,95 @@ namespace BioData.DataClients
           updatedProtoLocation.Dbresult = BioService.Result.Success;
         }
 
-
-        if (location.AccessDevice != null)
+        //AccessDevice
+        BioService.AccessDevice accessDevice = location.AccessDevice;
+        if (accessDevice != null)
         {
-          BioService.AccessDevice newAccessDevice = _accessDeviceDataClient.Add(existingLocation, location.AccessDevice, dataContext);
-          if (newAccessDevice.Id > 0)
+          if (accessDevice.EntityState == BioService.EntityState.Deleted)
           {
-            updatedProtoLocation.AccessDevice = newAccessDevice;
-            updatedProtoLocation.Dbresult = BioService.Result.Success;
+            AccessDevice existingAccessDevice = dataContext.AccessDevice.Where(x => x.PortName == accessDevice.Portname).FirstOrDefault();
+            if (existingAccessDevice != null)
+            {
+              _rawIndexes.Indexes.Clear();
+              _rawIndexes.Indexes.Add(existingAccessDevice.Id);
+              BioService.RawIndexes removedAccessDevice = _accessDeviceDataClient.Remove(_rawIndexes);
+              if (removedAccessDevice.Indexes.Count > 0)
+              {
+                updatedProtoLocation.AccessDevice = new BioService.AccessDevice()
+                {
+                    Id       = existingAccessDevice.Id
+                  , Dbresult = BioService.Result.Success
+                };
+                updatedProtoLocation.Dbresult = BioService.Result.Success;
+              }
+              else
+              {
+                updatedProtoLocation.AccessDevice = new BioService.AccessDevice()
+                {
+                    Id       = existingAccessDevice.Id
+                  , Dbresult = BioService.Result.Failed
+                };
+                updatedProtoLocation.Dbresult = BioService.Result.Failed;
+                return updatedProtoLocation;
+              }
+            }          
+          }
+          else
+          {
+            BioService.AccessDevice newAccessDevice = _accessDeviceDataClient.Add(existingLocation, accessDevice, dataContext);
+            if (newAccessDevice.Id > 0)
+            {
+              updatedProtoLocation.AccessDevice = newAccessDevice;
+              updatedProtoLocation.Dbresult     = BioService.Result.Success;
+            }
           }
         }
 
-        if (location.CaptureDevice != null)
+        //CaptureDevice
+        BioService.CaptureDevice captureDevice = location.CaptureDevice;
+        if (captureDevice != null)
         {
-          BioService.CaptureDevice newCaptureDevice = _captureDeviceDataClient.Add(existingLocation, location.CaptureDevice, dataContext);
-          if (newCaptureDevice.Id > 0)
+          if (captureDevice.EntityState == BioService.EntityState.Deleted)
           {
-            updatedProtoLocation.CaptureDevice = newCaptureDevice;
-            updatedProtoLocation.Dbresult = BioService.Result.Success;
+            CaptureDevice existingCaptureDevice = dataContext.CaptureDevice.Where(x => x.Device_Name == captureDevice.Devicename).FirstOrDefault();
+            if(existingCaptureDevice != null)
+            {
+              _rawIndexes.Indexes.Clear();
+              _rawIndexes.Indexes.Add(existingCaptureDevice.Id);
+              BioService.RawIndexes removedCaptureDevice = _captureDeviceDataClient.Remove(_rawIndexes);
+              if (removedCaptureDevice.Indexes.Count > 0)
+              {
+                updatedProtoLocation.CaptureDevice = new BioService.CaptureDevice()
+                {
+                    Id       = existingCaptureDevice.Id
+                  , Dbresult = BioService.Result.Success
+                };
+                updatedProtoLocation.Dbresult = BioService.Result.Success;
+              }
+              else
+              {
+                updatedProtoLocation.CaptureDevice = new BioService.CaptureDevice()
+                {
+                    Id       = existingCaptureDevice.Id
+                  , Dbresult = BioService.Result.Failed
+                };
+                updatedProtoLocation.Dbresult = BioService.Result.Failed;
+                return updatedProtoLocation;
+              }
+            }            
+          }
+          else
+          {
+            BioService.CaptureDevice newCaptureDevice = _captureDeviceDataClient.Add(existingLocation, location.CaptureDevice, dataContext);
+            if (newCaptureDevice.Id > 0)
+            {
+              updatedProtoLocation.CaptureDevice = newCaptureDevice;
+              updatedProtoLocation.Dbresult      = BioService.Result.Success;
+            }
           }
         }
 
+        //PersonAccess
         if(location.EntityState == BioService.EntityState.Modified)
         {
           RepeatedField<BioService.Person> results = _personAccessDataClient.Update(existingLocation, location, dataContext);
@@ -224,26 +290,18 @@ namespace BioData.DataClients
         foreach (AccessDevice accessDevice in location.AccessDevice)
           _accessDevicesRawIndexes.Indexes.Add(accessDevice.Id);
 
-        location.AccessDevice.Clear();
+        location.AccessDevice.Clear();        
 
         //CaptureDevice
         foreach (CaptureDevice captureDevice in location.CaptureDevice)
           _caprureDevicesRawIndexes.Indexes.Add(captureDevice.Id);
 
-        location.CaptureDevice.Clear();   
+        location.CaptureDevice.Clear();       
 
         //PersonAccess
         location.Access_Map_Id = null;
         location.PersonAccess  = null;
-        _rawIndexes.Indexes.Add(location.Id);
-
-        //Visitors
-        foreach (Visitor visitor in location.Visitor)
-          _visitorsRawIndexes.Indexes.Add(visitor.Id);
-
-        location.Visitor.Clear();        
-
-        dataContext.SaveChanges();
+        _rawIndexes.Indexes.Add(location.Id);  
 
         foreach (long id in _rawIndexes.Indexes)
         {
@@ -260,7 +318,6 @@ namespace BioData.DataClients
 
         BioService.RawIndexes accessDeviceIndexes = _accessDeviceDataClient.Remove(_accessDevicesRawIndexes);
         BioService.RawIndexes captureDeviceIndexes = _captureDeviceDataClient.Remove(_caprureDevicesRawIndexes);
-        BioService.RawIndexes visitorsIndexes = _visitorDataClient.Remove(_visitorsRawIndexes);
 
         var deletedLocations = dataContext.Location.RemoveRange(existingLocations);
         int affectedRows = dataContext.SaveChanges();
