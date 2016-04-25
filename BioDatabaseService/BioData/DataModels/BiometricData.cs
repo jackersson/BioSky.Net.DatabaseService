@@ -6,37 +6,22 @@ namespace BioData.DataModels
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("Photo")]
-    public partial class Photo
+    [Table("BiometricData")]
+    public partial class BiometricData
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Photo()
+        public BiometricData()
         {
             FaceCharacteristic = new HashSet<FaceCharacteristic>();
             FingerprintCharacteristic = new HashSet<FingerprintCharacteristic>();
             Person = new HashSet<Person>();
+            Visitor = new HashSet<Visitor>();
         }
 
         public long Id { get; set; }
 
-        [Column("Photo Url")]
-        [Required]
-        public string Photo_Url { get; set; }
-
-        [Column("Size Type")]
-        public byte? Size_Type { get; set; }
-
-        [Column("Origin Type")]
-        public byte? Origin_Type { get; set; }
-
-        public int Width { get; set; }
-
-        public int Height { get; set; }
-
-        public DateTime? Datetime { get; set; }
-
-        [Column("Owner Id")]
-        public long? Owner_Id { get; set; }
+        [StringLength(50)]
+        public string Information { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<FaceCharacteristic> FaceCharacteristic { get; set; }
@@ -47,6 +32,7 @@ namespace BioData.DataModels
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Person> Person { get; set; }
 
-        public virtual Person Owner { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Visitor> Visitor { get; set; }
     }
 }

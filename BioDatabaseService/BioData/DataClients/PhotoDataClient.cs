@@ -23,44 +23,63 @@ namespace BioData.DataClients
       }     
     }
 
-    public BioService.Photo Add(BioService.Photo item, BioSkyNetDataModel dataContext)
+    public BioService.Photo Add( Person existingPerson    ,  BioService.Photo request
+                               , BioService.Photo response, BioSkyNetDataModel dataContext)
     {
-      BioService.Photo newProtPhoto = new BioService.Photo() { Dbresult = BioService.Result.Failed };
-      if (item == null)
-        return newProtPhoto;
+      if (response == null)
+         response = new BioService.Photo() { Dbresult    = BioService.Result.Failed
+                                           , EntityState = BioService.EntityState.Added };   
+
+      if (IsPhotoValid(request))
+        return null;
+
+      try
+      {        
+        Photo entity = _convertor.GetPhotoEntity(request);
+        entity.Photo_Url = _utils.SavePersonImage(request.Bytestring, request.OwnerId);
+        
+        if (entity == null)
+          return response;
+
+        existingPerson.Photos.Add(entity);
+
+        int affectedRows = dataContext.SaveChanges();
+        if (affectedRows <= 0)
+          return response;
+
+        response.Dbresult = BioService.Result.Success;
+        response.Id       = entity.Id;
+        response.PhotoUrl = entity.Photo_Url;
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine(ex.Message);
+      }
+
+      return null;
+    }
+
+
+    public BioService.Photo Add(BioService.Photo request, BioSkyNetDataModel dataContext)
+    {
+      BioService.Photo response = new BioService.Photo() { Dbresult    = BioService.Result.Failed
+                                                         , EntityState = BioService.EntityState.Added };
+      if (IsPhotoValid(request))
+        return response;
             
       try
       {
-        Photo existingPhoto = dataContext.Photo.Where(x => x.Id == item.Id).FirstOrDefault();
-
-        if (existingPhoto != null)
-          return newProtPhoto;
-
-        Person owner = dataContext.Person.Where(x => x.Id == item.Personid).FirstOrDefault();
-
+        Person owner = dataContext.Person.Where(x => x.Id == request.OwnerId).FirstOrDefault();
         if (owner == null)
-          return newProtPhoto;
+          return response;
 
-        Photo newPhoto = _convertor.GetPhotoEntity(item);
-        newPhoto.Photo_Url = _utils.SavePersonImage(item.Bytestring, item.Personid);
-        owner.PhotoCollection.Add(newPhoto);
-        if (owner.PhotoCollection.Count == 1)
-          owner.Photo = newPhoto;
-
-        int affectedRows = dataContext.SaveChanges();
-
-        if (affectedRows > 0)
-        {
-          newProtPhoto.Id = newPhoto.Id;
-          newProtPhoto.PhotoUrl = newPhoto.Photo_Url;
-          newProtPhoto.Dbresult = BioService.Result.Success;
-        }
+        Add(owner, request, response, dataContext);
       }
       catch (Exception ex) {
         Console.WriteLine(ex.Message);
       }
       
-      return newProtPhoto;
+      return response;
     }
 
 
@@ -87,8 +106,8 @@ namespace BioData.DataClients
 
         foreach (Photo photo in existingPhotos)
         {
-          photo.Person_Id = null;
-          photo.Portrait_Characteristics_Id = null;
+          //photo.Person_Id = null;
+         // photo.Portrait_Characteristics_Id = null;
         }
 
         dataContext.SaveChanges();
@@ -132,13 +151,20 @@ namespace BioData.DataClients
       {
         try
         {
-          IQueryable<Photo> photoEtities = DataContext.Photo;
-          foreach (Photo p in photoEtities)
-          {
-            BioService.Photo protoPhoto = _convertor.GetPhotoProto(p);      
-            if (protoPhoto != null)
-              photos.Photos.Add(protoPhoto);
-          }
+          long targetId = query.Photos.FirstOrDefault();
+         
+            
+
+          Photo photoEtities = DataContext.Photo.Find(targetId);
+          BioService.Photo protoPhoto = _convertor.GetPhotoProto(photoEtities);
+          if (protoPhoto != null)
+            photos.Photos.Add(protoPhoto);
+          //foreach (Photo p in photoEtities)
+          //{
+          //  BioService.Photo protoPhoto = _convertor.GetPhotoProto(p);      
+          //  if (protoPhoto != null)
+          //    photos.Photos.Add(protoPhoto);
+          //}
         }
         catch (Exception ex)   {
           Console.WriteLine(ex.Message);
@@ -147,6 +173,12 @@ namespace BioData.DataClients
         return photos;
       }
     }
+
+    private bool IsPhotoValid(BioService.Photo request)
+    {
+      return request == null || request.Bytestring == null || request.Bytestring.Count() <= 0;
+    }
+
 
     private IProcessorLocator     _locator  ;
     private ProtoMessageConvertor _convertor;

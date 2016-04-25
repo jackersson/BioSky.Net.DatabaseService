@@ -12,9 +12,7 @@ namespace BioData.DataModels
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Location()
         {
-            AccessDevice = new HashSet<AccessDevice>();
-            CaptureDevice = new HashSet<CaptureDevice>();
-            PersonAccessCollection = new HashSet<PersonAccess>();
+            PersonAccess = new HashSet<PersonAccess>();
             Visitor = new HashSet<Visitor>();
         }
 
@@ -30,19 +28,26 @@ namespace BioData.DataModels
         [Column("Access Type")]
         public byte? Access_Type { get; set; }
 
-        [Column("Access Map Id")]
-        public long? Access_Map_Id { get; set; }
+        [Required]
+        public string MacAddress { get; set; }
+
+        [Column("Access Device ID")]
+        public long? Access_Device_ID { get; set; }
+
+        [Column("Capture Device ID")]
+        public long? Capture_Device_ID { get; set; }
+
+        [Column("Fingerprint Device ID")]
+        public long? Fingerprint_Device_ID { get; set; }
+
+        public virtual AccessDevice AccessDevice { get; set; }
+
+        public virtual CaptureDevice CaptureDevice { get; set; }
+
+        public virtual FingerprintDevice FingerprintDevice { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AccessDevice> AccessDevice { get; set; }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<CaptureDevice> CaptureDevice { get; set; }
-
-        public virtual PersonAccess PersonAccess { get; set; }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<PersonAccess> PersonAccessCollection { get; set; }
+        public virtual ICollection<PersonAccess> PersonAccess { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Visitor> Visitor { get; set; }

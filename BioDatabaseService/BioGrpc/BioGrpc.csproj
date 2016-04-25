@@ -91,6 +91,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BioClientsEngine.cs" />
     <Compile Include="BioGrpcInstaller.cs" />
     <Compile Include="BiometricDatabaseSeviceImpl.cs" />
     <Compile Include="BioServiceManager.cs" />

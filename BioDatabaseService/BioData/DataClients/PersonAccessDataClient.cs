@@ -16,24 +16,28 @@ namespace BioData.DataClients
       _convertor = new ProtoMessageConvertor();
     }
        
-    public RepeatedField<BioService.Person> Update(Location existingLocation, BioService.Location item, BioSkyNetDataModel dataContext)
+    public BioService.AccessInfo Update( Location existingLocation
+                                       , BioService.AccessInfo request
+                                       , BioSkyNetDataModel dataContext )
     {
-      RepeatedField<BioService.Person > newProtoLocation = new RepeatedField<BioService.Person>();
-      if (item == null )
-        return newProtoLocation;
+      if (request == null || request.EntityState == BioService.EntityState.Unchanged)
+        return null;
+
+      BioService.AccessInfo response = new BioService.AccessInfo() { EntityState = BioService.EntityState.Modified
+                                                                   , Dbresult = BioService.Result.Failed };
 
       try
       {
         IQueryable<PersonAccess> existingRecords = dataContext.PersonAccess.Where(x => x.Location_Id == existingLocation.Id);
      
-        if (item.AccessType == BioService.Location.Types.AccessType.Custom)
+        if (request.AccessType == BioService.AccessInfo.Types.AccessType.Custom)
         {
-          List<PersonAccess> listToAdd     = new List<PersonAccess>();
-          HashSet<long> existingItems = new HashSet<long>(existingRecords.Select(x => x.Person_Id));
-          HashSet<long> itemsToRemove = new HashSet<long>(item.Persons.Where(x => 
+          List<PersonAccess> listToAdd  = new List<PersonAccess>();
+          HashSet<long> existingItems   = new HashSet<long>(existingRecords.Select(x => x.Person_Id));
+          HashSet<long> itemsToRemove   = new HashSet<long>(request.Persons.Where(x => 
                                                                              x.EntityState == BioService.EntityState.Deleted)
                                                                              .Select( x => x.Id) );
-          HashSet<long> itemsToAdd    = new HashSet<long>(item.Persons.Where(x => 
+          HashSet<long> itemsToAdd    = new HashSet<long>(request.Persons.Where(x => 
                                                                              x.EntityState == BioService.EntityState.Added  )
                                                                              .Select(x => x.Id ) );
 
@@ -55,21 +59,41 @@ namespace BioData.DataClients
         else
           dataContext.PersonAccess.RemoveRange(existingRecords);
 
+        existingLocation.Access_Type = (byte)request.AccessType;
+
         int affectedRows = dataContext.SaveChanges();
-        if (affectedRows > 0)
+        if (affectedRows <= 0)
+          return response;           
+
+        if ( request.AccessType == BioService.AccessInfo.Types.AccessType.Custom)
         {
           IQueryable<PersonAccess> newExistingRecords = dataContext.PersonAccess.Where(x => x.Location_Id == existingLocation.Id);
-          foreach (PersonAccess pa in newExistingRecords)          
-            newProtoLocation.Add(new BioService.Person() { Id = pa.Person_Id });       
-        }
+          foreach (PersonAccess pa in newExistingRecords)
+            response.Persons.Add(new BioService.Person() { Id = pa.Person_Id });
+        }        
+       
+        response.AccessType = request.AccessType;        
       }
       catch (Exception ex) {
         Console.WriteLine(ex.Message);
       }
 
-      return newProtoLocation;
+      return response;
     }
-    
+
+    /*
+    private BioService.AccessInfo.Types.AccessType GetAccessType(int personAccessCount, int allPersonsCount)
+    {
+      BioService.AccessInfo.Types.AccessType result = BioService.AccessInfo.Types.AccessType.Custom;
+      if (personAccessCount == 0)
+        result = BioService.AccessInfo.Types.AccessType.None;
+      else if (personAccessCount == allPersonsCount)
+        result = BioService.AccessInfo.Types.AccessType.All;
+
+      return result;
+    }
+    */
+
     private IProcessorLocator _locator;
     private ProtoMessageConvertor _convertor;
   }

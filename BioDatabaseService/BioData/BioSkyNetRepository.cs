@@ -8,28 +8,46 @@ namespace BioData
   {
     public BioSkyNetRepository( IProcessorLocator locator )
     {
-      _locator = locator;  
-      
-      CardsDataClient  = new CardDataClient(locator);
+      _locator = locator;
+
       PhotosDataClient = new PhotoDataClient(locator);
 
-      AccessDeviceDataClient  accessDeviceDataClient  = new AccessDeviceDataClient (locator);
-      CaptureDeviceDataClient captureDeviceDataClient = new CaptureDeviceDataClient(locator);
-      PersonAccessDataClient  personAccessDataClient  = new PersonAccessDataClient (locator);
+      BiometricLocationDataClient  = new BiometricLocationDataClient(locator);
+      EyesCharacteristicDataClient = new EyesCharacteristicDataClient(locator, BiometricLocationDataClient);
+      FaceCharacteristicDataClient = new FaceCharacteristicDataClient(locator, EyesCharacteristicDataClient, BiometricLocationDataClient);
+      FacialDataClient             = new FacialDataClient(locator, PhotosDataClient, FaceCharacteristicDataClient);
 
-      VisitorsDataClient  = new VisitorDataClient(locator);
-      LocationsDataClient = new LocationDataClient(locator, accessDeviceDataClient, captureDeviceDataClient, personAccessDataClient, VisitorsDataClient);
+      CardsDataClient     = new CardDataClient     (locator);
+      BiometricDataClient = new BiometricDataClient(locator, FacialDataClient);
 
-      PersonDataClient = new PersonDataClient(locator, PhotosDataClient, CardsDataClient);
+      AccessDeviceDataClient      accessDeviceDataClient      = new AccessDeviceDataClient     (locator);
+      CaptureDeviceDataClient     captureDeviceDataClient     = new CaptureDeviceDataClient    (locator);
+      FingerprintDeviceDataClient fingerprintDeviceDataClient = new FingerprintDeviceDataClient(locator);
+      PersonAccessDataClient      personAccessDataClient      = new PersonAccessDataClient     (locator);
+
+      VisitorsDataClient  = new VisitorDataClient(locator, BiometricDataClient);
+      LocationsDataClient = new LocationDataClient( locator
+                                                  , accessDeviceDataClient
+                                                  , captureDeviceDataClient
+                                                  , fingerprintDeviceDataClient
+                                                  , personAccessDataClient
+                                                  , VisitorsDataClient          );
+
+      PersonDataClient = new PersonDataClient(locator, CardsDataClient, BiometricDataClient);
    
     }  
     
 
-    public PersonDataClient   PersonDataClient   ;
-    public CardDataClient     CardsDataClient    ;
-    public PhotoDataClient    PhotosDataClient   ;
-    public LocationDataClient LocationsDataClient;
-    public VisitorDataClient  VisitorsDataClient ;
+    public PersonDataClient              PersonDataClient   ;
+    public CardDataClient                CardsDataClient    ;
+    public PhotoDataClient               PhotosDataClient   ;
+    public LocationDataClient            LocationsDataClient;
+    public VisitorDataClient             VisitorsDataClient ;
+    public BiometricDataClient           BiometricDataClient;
+    public FacialDataClient              FacialDataClient   ;
+    public FaceCharacteristicDataClient  FaceCharacteristicDataClient;
+    public EyesCharacteristicDataClient  EyesCharacteristicDataClient;
+    public BiometricLocationDataClient   BiometricLocationDataClient ;
 
     private readonly IProcessorLocator _locator;
   }

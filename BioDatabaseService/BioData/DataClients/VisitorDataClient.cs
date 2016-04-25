@@ -8,14 +8,15 @@ namespace BioData.DataClients
 {
   public class VisitorDataClient
   {
-    public VisitorDataClient(IProcessorLocator locator)
+    public VisitorDataClient(IProcessorLocator locator, BiometricDataClient biometricDataClient)
     {
       _locator         = locator;
       _convertor       = new ProtoMessageConvertor();
-      _rawPhotoIndexes = new BioService.RawIndexes();
+      _biometricDataClient = biometricDataClient;
+    
     }
 
-    public BioService.Visitor Add(BioService.Visitor visitor)
+    public BioService.Visitor Add(BioService.FullVisitorData visitor)
     {
       using (var dataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
       {
@@ -23,37 +24,34 @@ namespace BioData.DataClients
       }
     }
 
-    public BioService.Visitor Add(BioService.Visitor visitor, BioSkyNetDataModel dataContext)
+    public BioService.Visitor Add(BioService.FullVisitorData request, BioSkyNetDataModel dataContext)
     {
-      BioService.Visitor newProtoVisitor = new BioService.Visitor { Dbresult = BioService.Result.Failed };
-      
-      if (visitor == null )
-        return newProtoVisitor;
+      BioService.Visitor response = new BioService.Visitor { Dbresult = BioService.Result.Failed
+                                                           , EntityState = BioService.EntityState.Added };      
+      if (request == null || request.Visitor == null)
+        return response;
 
       try
       {
-        Visitor existingVisitor = dataContext.Visitor.Where(x => x.Id == visitor.Id).FirstOrDefault();
-
-        if (existingVisitor != null)
-          return newProtoVisitor;
-
-
-        Visitor newVisitor = _convertor.GetVisitorEntity(visitor);
-        dataContext.Visitor.Add(newVisitor);
+        BioService.Visitor visitor = request.Visitor;
+        
+        Visitor entity = _convertor.GetVisitorEntity(visitor);
+        dataContext.Visitor.Add(entity);
+        
         int affectedRows = dataContext.SaveChanges();
         if (affectedRows <= 0)
-          return newProtoVisitor;
+          return response;
+        response.Id       = entity.Id                ;
+        response.Dbresult = BioService.Result.Success;
 
-        newProtoVisitor.Dbresult = BioService.Result.Success;
-        newProtoVisitor.Id       = newVisitor.Id;
-
-        return newProtoVisitor;
+        response.BiometricData = _biometricDataClient.Add(entity, request, dataContext);          
+        
       }
       catch (Exception ex) {
         Console.WriteLine(ex.Message);
       }
 
-      return newProtoVisitor;
+      return response;
     }
 
     public BioService.VisitorList Select(BioService.QueryVisitors query, BioSkyNetDataModel dataContext)
@@ -101,43 +99,7 @@ namespace BioData.DataClients
 
       try
       {
-        var existingVisitors = dataContext.Visitor.Where(x => items.Indexes.Contains(x.Id));
-
-        if (existingVisitors == null)
-          return removedItems;
-        
-        _rawPhotoIndexes.Indexes.Clear();
-
-        foreach (Visitor visitor in existingVisitors)
-        {
-          visitor.Person_ID = null;
-          visitor.Location_Id = -1;
-
-          if(visitor.Croped_Photo_Id.HasValue)
-            _rawPhotoIndexes.Indexes.Add(visitor.Croped_Photo_Id.Value);
-
-          if (visitor.Full_Photo_Id.HasValue)
-            _rawPhotoIndexes.Indexes.Add(visitor.Full_Photo_Id.Value);
-
-          visitor.Croped_Photo_Id = null;
-          visitor.Full_Photo_Id = -1;
-        }
-
-        BioService.RawIndexes photoIndexes = _photoDataClient.Remove(_rawPhotoIndexes);
-
-
-        var deletedLocations = dataContext.Visitor.RemoveRange(existingVisitors);
-        int affectedRows = dataContext.SaveChanges();
-        if (deletedLocations.Count() == affectedRows)
-          return items;
-        else
-        {
-          foreach (long id in items.Indexes)
-          {
-            if (dataContext.Visitor.Find(id) == null)
-              removedItems.Indexes.Add(id);
-          }
-        }
+      
       }
       catch (Exception ex) {
         Console.WriteLine(ex.Message);
@@ -146,11 +108,9 @@ namespace BioData.DataClients
       return removedItems;
     }
 
-    private IProcessorLocator        _locator        ;
-    private ProtoMessageConvertor    _convertor      ;
-    private readonly PhotoDataClient _photoDataClient;
-    private BioService.RawIndexes    _rawPhotoIndexes;
-
+    private IProcessorLocator            _locator            ;
+    private ProtoMessageConvertor        _convertor          ;
+    private readonly BiometricDataClient _biometricDataClient;
 
   }
 }

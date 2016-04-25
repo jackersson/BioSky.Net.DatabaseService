@@ -4,18 +4,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7FF4820C-FF68-4EAD-BECF-800BA02415A8}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{00E2AABF-2B58-40C6-8D8F-1BA843FAA7B7}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BioContracts</RootNamespace>
-    <AssemblyName>BioContracts</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>DatabaseWindowsService</RootNamespace>
+    <AssemblyName>DatabaseWindowsService</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,9 +23,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,25 +33,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BioContracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\BioContracts.dll</HintPath>
+    </Reference>
+    <Reference Include="BioGrpc, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\BioGrpc.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
@@ -78,45 +68,60 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Interactive.Async, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Ix-Async.1.2.5\lib\net45\System.Interactive.Async.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\ProcessorLocator.cs" />
-    <Compile Include="Common\ServiceConfiguration.cs" />
-    <Compile Include="IConnectionBuilder.cs" />
-    <Compile Include="IContextFactory.cs" />
-    <Compile Include="IProcessorLocator.cs" />
-    <Compile Include="IServiceConfiguration.cs" />
+    <Compile Include="BioDatabaseServiceImpl.cs" />
+    <Compile Include="BioDatabaseServiceInstaller.cs" />
+    <Compile Include="DbService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ModulesLoader.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="ProjectInstaller.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ProjectInstaller.Designer.cs">
+      <DependentUpon>ProjectInstaller.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Protobuf\BioService.cs" />
-    <Compile Include="Protobuf\BioServiceGrpc.cs" />
+    <Compile Include="Service1.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Service1.Designer.cs">
+      <DependentUpon>Service1.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ProjectInstaller.resx">
+      <DependentUpon>ProjectInstaller.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\grpc.dependencies.zlib.redist.1.2.8.10\build\portable-net45+netcore45+wpa81+wp8\grpc.dependencies.zlib.redist.targets" Condition="Exists('..\packages\grpc.dependencies.zlib.redist.1.2.8.10\build\portable-net45+netcore45+wpa81+wp8\grpc.dependencies.zlib.redist.targets')" />
+  <Import Project="..\packages\grpc.native.csharp.0.13.1\build\portable-net45+netcore45+wpa81+wp8\grpc.native.csharp.targets" Condition="Exists('..\packages\grpc.native.csharp.0.13.1\build\portable-net45+netcore45+wpa81+wp8\grpc.native.csharp.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\grpc.dependencies.zlib.redist.1.2.8.10\build\portable-net45+netcore45+wpa81+wp8\grpc.dependencies.zlib.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\grpc.dependencies.zlib.redist.1.2.8.10\build\portable-net45+netcore45+wpa81+wp8\grpc.dependencies.zlib.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\grpc.dependencies.openssl.redist.1.0.204.1\build\portable-net45+netcore45+wpa81+wp8\grpc.dependencies.openssl.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\grpc.dependencies.openssl.redist.1.0.204.1\build\portable-net45+netcore45+wpa81+wp8\grpc.dependencies.openssl.redist.targets'))" />
     <Error Condition="!Exists('..\packages\grpc.native.csharp.0.13.1\build\portable-net45+netcore45+wpa81+wp8\grpc.native.csharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\grpc.native.csharp.0.13.1\build\portable-net45+netcore45+wpa81+wp8\grpc.native.csharp.targets'))" />
   </Target>
-  <Import Project="..\packages\grpc.dependencies.openssl.redist.1.0.204.1\build\portable-net45+netcore45+wpa81+wp8\grpc.dependencies.openssl.redist.targets" Condition="Exists('..\packages\grpc.dependencies.openssl.redist.1.0.204.1\build\portable-net45+netcore45+wpa81+wp8\grpc.dependencies.openssl.redist.targets')" />
-  <Import Project="..\packages\grpc.native.csharp.0.13.1\build\portable-net45+netcore45+wpa81+wp8\grpc.native.csharp.targets" Condition="Exists('..\packages\grpc.native.csharp.0.13.1\build\portable-net45+netcore45+wpa81+wp8\grpc.native.csharp.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -109,8 +109,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataClients\AccessDeviceDataClient.cs" />
+    <Compile Include="DataClients\BiometricDataClient.cs" />
+    <Compile Include="DataClients\BiometricLocationDataClient.cs" />
     <Compile Include="DataClients\CaptureDeviceDataClient.cs" />
     <Compile Include="DataClients\CardDataClient.cs" />
+    <Compile Include="DataClients\EyesCharacteristicDataClient.cs" />
+    <Compile Include="DataClients\FaceCharacteristicDataClient.cs" />
+    <Compile Include="DataClients\FacialDataClient.cs" />
+    <Compile Include="DataClients\FingerprintDeviceDataClient.cs" />
     <Compile Include="DataClients\LocationDataClient.cs" />
     <Compile Include="DataClients\PersonAccessDataClient.cs" />
     <Compile Include="DataClients\PersonDataClient.cs" />
@@ -119,6 +125,7 @@
     <Compile Include="BioDataInstaller.cs" />
     <Compile Include="BioSkyNetRepository.cs" />
     <Compile Include="DataModels\AccessDevice.cs" />
+    <Compile Include="DataModels\BiometricData.cs" />
     <Compile Include="DataModels\BiometricLocation.cs" />
     <Compile Include="DataModels\BioSkyNetDataModel.cs" />
     <Compile Include="DataModels\CaptureDevice.cs" />
@@ -126,6 +133,8 @@
     <Compile Include="DataModels\Criminal.cs" />
     <Compile Include="DataModels\EyesCharacteristic.cs" />
     <Compile Include="DataModels\FaceCharacteristic.cs" />
+    <Compile Include="DataModels\FingerprintCharacteristic.cs" />
+    <Compile Include="DataModels\FingerprintDevice.cs" />
     <Compile Include="DataModels\Location.cs" />
     <Compile Include="DataModels\Person.cs" />
     <Compile Include="DataModels\PersonAccess.cs" />

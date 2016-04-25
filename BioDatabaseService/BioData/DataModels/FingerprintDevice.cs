@@ -6,11 +6,11 @@ namespace BioData.DataModels
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("AccessDevice")]
-    public partial class AccessDevice
+    [Table("FingerprintDevice")]
+    public partial class FingerprintDevice
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public AccessDevice()
+        public FingerprintDevice()
         {
             Location = new HashSet<Location>();
         }
@@ -19,7 +19,11 @@ namespace BioData.DataModels
 
         [Required]
         [StringLength(50)]
-        public string PortName { get; set; }
+        public string DeviceName { get; set; }
+
+        //[Required]
+        [StringLength(50)]
+        public string SerialNumber { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Location> Location { get; set; }

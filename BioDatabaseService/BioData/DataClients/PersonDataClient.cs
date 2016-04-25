@@ -2,22 +2,71 @@
 using BioData.DataModels;
 using BioData.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BioData.DataClients
 {
   public class PersonDataClient
   {
-    public PersonDataClient( IProcessorLocator locator, PhotoDataClient photoDataClient
-                           , CardDataClient cardDataClient)
+    public PersonDataClient( IProcessorLocator locator
+                           , CardDataClient cardDataClient
+                           , BiometricDataClient biometricDataClient  )
     {
       _locator    = locator;
       _convertor  = new ProtoMessageConvertor();
       _rawIndexes = new BioService.RawIndexes();
 
-      _photoDataClient = photoDataClient;
-      _cardDataClient  = cardDataClient;
+      _biometricDataClient = biometricDataClient;
+      _cardDataClient      = cardDataClient;
     }
+
+    public bool PersonExists(string firstName, string lastName, BioSkyNetDataModel dataContext)
+    {
+      return dataContext.Person.Where(x => x.First_Name_ == firstName && x.Last_Name_ == lastName).Count() > 0;
+    }
+
+    public BioService.Person Add(BioService.Person person)
+    {
+      using (var dataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
+      {
+        return Add(person, dataContext);
+      }
+    }
+
+    public BioService.Person Add(BioService.Person request, BioSkyNetDataModel dataContext)
+    {
+      BioService.Person response = new BioService.Person { Dbresult = BioService.Result.Failed, EntityState = BioService.EntityState.Added };
+      if (request == null)
+        return response;
+
+      try
+      {
+        if (PersonExists(request.Firstname, request.Lastname, dataContext))
+          return response;
+              
+        Person entity = _convertor.GetPersonEntity(request);
+        dataContext.Person.Add(entity);
+
+        int affectedRows = dataContext.SaveChanges();
+        if (affectedRows <= 0)
+          return response;
+
+        response.Id       = entity.Id;
+        response.Dbresult = BioService.Result.Success;
+
+        BioService.BiometricData bd = _biometricDataClient.Add(entity, new BioService.BiometricData(), dataContext);
+        if (bd != null)
+          response.BiometricData = bd;
+      }
+      catch (Exception ex) {
+        Console.WriteLine(ex.Message);
+      }
+
+      return response;
+    }
+
+
 
     public BioService.Person Update(BioService.Person person)
     {
@@ -27,51 +76,83 @@ namespace BioData.DataClients
       }      
     }
     //TODO make update for all person
-    public BioService.Person Update(BioService.Person person, BioSkyNetDataModel dataContext)
+    public BioService.Person Update(BioService.Person request, BioSkyNetDataModel dataContext)
     {
-      BioService.Person updatedProtoPerson = new BioService.Person { Dbresult = BioService.Result.Failed };
-      if (person == null)
-        return updatedProtoPerson;
+      BioService.Person response = new BioService.Person { Id = request.Id
+                                                         , EntityState = BioService.EntityState.Modified
+                                                         , Dbresult = BioService.Result.Failed };
+      if (request == null)
+        return response;
      
       try
       {
-        Person existingPerson = dataContext.Person.Find(person.Id);
+        Person existingPerson = dataContext.Person.Find(request.Id);
 
         if (existingPerson == null)
-          return updatedProtoPerson;        
+          return response;
 
-        if (person.Firstname != "")
-          existingPerson.First_Name_ = person.Firstname;        
 
-        if (person.Lastname != "")
-          existingPerson.Last_Name_ = person.Lastname;
+        #region validation
+        bool hasFirstName = !string.IsNullOrEmpty(request.Firstname);
+        bool hasLastName  = !string.IsNullOrEmpty(request.Lastname );
 
-        if(person.Dateofbirth != 0)
+        if (hasFirstName || hasLastName)
         {
-          DateTime dateofbirth = (person.Dateofbirth != -1)? new DateTime(person.Dateofbirth): new DateTime();
+          bool hasNewFirstName = hasFirstName && !existingPerson.First_Name_.Equals(request.Firstname);
+          bool hasNewLastName  = hasLastName  && !existingPerson.Last_Name_.Equals(request.Lastname);
+
+          string targetFirstName = hasNewFirstName ? request.Firstname : existingPerson.First_Name_;
+          string targetLastName  = hasNewLastName  ? request.Lastname : existingPerson.Last_Name_;
+
+          if (!PersonExists(targetFirstName, targetLastName, dataContext))
+          {
+            existingPerson.First_Name_ = targetFirstName;
+            existingPerson.Last_Name_  = targetLastName;
+          }
+          else
+            return response;
+        }
+               
+        if(request.Dateofbirth != 0)
+        {
+          DateTime dateofbirth = new DateTime(request.Dateofbirth);
           if (existingPerson.Date_Of_Birth != dateofbirth)
             existingPerson.Date_Of_Birth = dateofbirth;
         }
 
-        if (person.Country != "")
-          existingPerson.Country = (person.Country != "(Deleted)") ? person.Country : "";
+        if (!string.IsNullOrEmpty(request.Country))        
+          existingPerson.Country = _convertor.IsDeleteState(request.Country) ? string.Empty : request.Country;
 
-        if (person.City != "")
-          existingPerson.City = (person.City != "(Deleted)") ? person.City : "";
+        if (!string.IsNullOrEmpty(request.City))
+          existingPerson.City = _convertor.IsDeleteState(request.Country) ? string.Empty : request.City;
 
-        if (person.Email != "")
-          existingPerson.Email = (person.Email != "(Deleted)") ? person.Email : "";
+        if (!string.IsNullOrEmpty(request.Comments))
+          existingPerson.Comments = _convertor.IsDeleteState(request.Country) ? string.Empty : request.Comments;
 
-        if (person.Comments != "")
-          existingPerson.Comments = (person.Comments != "(Deleted)") ? person.Comments : "";
-
-        byte gender = (byte)person.Gender;
+        if (!string.IsNullOrEmpty(request.Email))
+          existingPerson.Email = _convertor.IsDeleteState(request.Country) ? string.Empty : request.Email;
+        
+        byte gender = (byte)request.Gender;
         if (existingPerson.Gender != gender)
           existingPerson.Gender = gender;
 
-        byte rights = (byte)person.Rights;
+        byte rights = (byte)request.Rights;
         if (existingPerson.Rights != rights)
-          existingPerson.Rights = (byte)person.Rights;
+          existingPerson.Rights = (byte)request.Rights;
+        #endregion
+
+       
+        int affectedRows = dataContext.SaveChanges();
+        if (affectedRows <= 0)
+          return response;
+
+        response.Dbresult = BioService.Result.Success;
+
+        // BioService.BiometricData biometricData = person.Data;
+
+
+
+        /*
 
         BioService.Photo currentPhoto = person.Thumbnail;
 
@@ -119,7 +200,7 @@ namespace BioData.DataClients
           if (affectedRows <= 0)
             return updatedProtoPerson;
         }
-
+        #region  send validation
         if (person.Firstname != "")
           updatedProtoPerson.Firstname = person.Firstname;
 
@@ -146,73 +227,38 @@ namespace BioData.DataClients
 
         if (existingPerson.Rights != rights)
           updatedProtoPerson.Rights = person.Rights;
-
-        updatedProtoPerson.Dbresult = BioService.Result.Success;
+        #endregion
+        
+        updatedProtoPerson.Dbresult = BioService.Result.Success; */
       }
       catch (Exception ex) {
         Console.WriteLine(ex.Message);
       }     
 
-      return updatedProtoPerson;
+      return response;
     }
 
-    public BioService.Person Add( BioService.Person person )
-    {     
-      using (var dataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
-      {
-        return Add(person, dataContext);
-      }      
-    }
-
-    public BioService.Person Add(BioService.Person person, BioSkyNetDataModel dataContext)
+    
+    public Photo GetPersonThumbnailOrDefault( Person person, BioSkyNetDataModel dataContext)
     {
-      BioService.Person newProtoPerson = new BioService.Person { Dbresult = BioService.Result.Failed };
-      if (person == null || person.Thumbnail == null)
-        return newProtoPerson;
-     
-      try
-      {
-        Person existingPerson = dataContext.Person.Where(x => x.First_Name_ == person.Firstname
-                                                      && x.Last_Name_ == person.Lastname).FirstOrDefault();
+      if (person.BiometricData != null || person.BiometricData.FaceCharacteristic == null)
+        return null;
 
-        if (existingPerson != null)
-          return newProtoPerson;
+      ICollection<FaceCharacteristic> faces = person.BiometricData.FaceCharacteristic;
 
-        Person newPerson = _convertor.GetPersonEntity(person);
-        dataContext.Person.Add(newPerson);
+      byte thumbnail = (byte)BioService.PhotoOriginType.Thumbnail;
+      FaceCharacteristic fc = person.BiometricData.FaceCharacteristic
+                       .Where(x => x.Photo.Origin_Type == thumbnail).FirstOrDefault();
+      if (fc == null)
+        fc = person.BiometricData.FaceCharacteristic.FirstOrDefault();
 
-        int affectedRows = dataContext.SaveChanges();
-        if (affectedRows <= 0)
-          return newProtoPerson;
+      if (fc == null)
+        return null;
 
-        newProtoPerson.Id = newPerson.Id;
-
-        BioService.Photo requestedPhoto = person.Thumbnail;
-        requestedPhoto.Personid = newPerson.Id;
-
-        BioService.Photo insertedPhoto = _photoDataClient.Add(person.Thumbnail, dataContext);
-
-        if (insertedPhoto.Dbresult != BioService.Result.Success)
-        {
-          Remove(newProtoPerson, dataContext);
-          return newProtoPerson;
-        }
-
-        requestedPhoto.Id        = insertedPhoto.Id;        
-        newProtoPerson.Photoid   = insertedPhoto.Id;
-        newProtoPerson.Thumbnail = new BioService.Photo() { Id = insertedPhoto.Id, PhotoUrl = insertedPhoto.PhotoUrl };
-
-        BioService.Response response = SetThumbnail(requestedPhoto, dataContext);
-
-        newProtoPerson.Dbresult = response.Good;
-      }
-      catch (Exception ex){
-        Console.WriteLine(ex.Message);
-      }     
-
-      return newProtoPerson;
+      return fc.Photo;
     }
 
+ 
     public BioService.Person Remove( BioService.Person person )
     { 
       using (var dataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
@@ -221,16 +267,29 @@ namespace BioData.DataClients
       }      
     }
 
-    public BioService.Person Remove(BioService.Person person, BioSkyNetDataModel dataContext)
+    public BioService.Person Remove(BioService.Person request, BioSkyNetDataModel dataContext)
     {
-      BioService.Person deletedProtoPerson = new BioService.Person { Dbresult = BioService.Result.Failed };
-      if (person == null)
-        return deletedProtoPerson;
-     
+      BioService.Person response = new BioService.Person { EntityState = BioService.EntityState.Deleted
+                                                         , Dbresult = BioService.Result.Failed };
+      if (request == null)
+        return response;
+
+      response.Id = request.Id;
       try
       {
+        var entity = dataContext.Person.Find(request.Id);
+        if (entity == null)
+        {
+          response.Dbresult = BioService.Result.Success;
+          return response;
+        }
+               
+        dataContext.Person.Remove(entity);
+        int affectedRows = dataContext.SaveChanges();
+        if (affectedRows > 0)
+          response.Dbresult = BioService.Result.Success;
 
-
+        /*
         Person deletePerson = dataContext.Person.Find(person.Id);
         if (deletePerson == null)
           return deletedProtoPerson;
@@ -278,13 +337,14 @@ namespace BioData.DataClients
             deletedProtoPerson.Photos.Add(photo);
           }
         }
+        */
       }
       catch (Exception ex)
       {
         Console.WriteLine(ex.Message);
       }      
 
-      return deletedProtoPerson;
+      return response;
     }
 
     public BioService.PersonList Select( BioSkyNetDataModel dataContext )
@@ -316,48 +376,111 @@ namespace BioData.DataClients
       }
     }
 
-    public BioService.Response SetThumbnail(BioService.Photo item, BioSkyNetDataModel dataContext)
+    #region thumbnail
+    public BioService.Photo SetDefaultThumbnail(Person owner, BioSkyNetDataModel dataContext)
     {
-      BioService.Response response = new BioService.Response() { Good = BioService.Result.Failed };
-      if (item == null)
+      if (owner.Thumbnail == null)
+        return null;
+
+      Photo photo = GetDefaultPhoto(owner, dataContext);
+
+      if (photo == null)
+        return null;
+
+      return SetThumbnail(owner, photo, dataContext);
+    }
+
+    public BioService.Photo SetThumbnail(Person owner, Photo photoEntity, BioSkyNetDataModel dataContext)
+    {
+      BioService.Photo response = new BioService.Photo() { Dbresult    = BioService.Result.Failed
+                                                         , EntityState = BioService.EntityState.Modified
+                                                         , OriginType  = BioService.PhotoOriginType.Thumbnail };
+
+
+      if (owner == null || photoEntity == null)
         return response;
 
       try
       {
-        Person owner = dataContext.Person.Where(x => x.Id == item.Personid).FirstOrDefault();
+        owner.Thumbnail_Id = photoEntity.Id;
 
-        if (owner == null)
-          return response;
-
-        Photo existingPhoto = owner.PhotoCollection.Where(x => x.Id == item.Id).FirstOrDefault();
-
-        if (existingPhoto == null)        
-          return response;       
-
-        owner.Photo = existingPhoto;
-      
-        dataContext.SaveChanges();      
-        response.Good = BioService.Result.Success;      
-      }
+        int affectedRows = dataContext.SaveChanges();
+        if (affectedRows > 0)
+          response.Dbresult = BioService.Result.Success;
+      }   
       catch (Exception ex)
       {
         Console.WriteLine(ex.Message);
       }
-     
+
       return response;
     }
 
-    public BioService.Response SetThumbnail(BioService.Photo item)
+
+    public BioService.Photo SetThumbnail(long ownerId, long photoID, BioSkyNetDataModel dataContext)
+    {
+      Person owner         = dataContext.Person.Where(x => x.Id == ownerId).FirstOrDefault();
+      Photo  existingPhoto = GetPersonPhotoById(owner, photoID, dataContext);
+
+      return SetThumbnail(owner, existingPhoto, dataContext);      
+    }
+
+    public BioService.Photo SetThumbnail(long ownerId, long photoID)
     {    
       using (var dataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
       {
-        return SetThumbnail(item, dataContext);
+        return SetThumbnail(ownerId, photoID, dataContext);
       }     
     }
+    #endregion
+
+    #region PhotoSearch
+    public Photo GetPersonPhotoById(Person person, long photoId, BioSkyNetDataModel dataContext)
+    {
+      if (person.Photos != null && person.Photos.Count > 0)
+      {
+        Photo photo = person.Photos.Where(x => x.Id == photoId).FirstOrDefault();
+        if (photo != null)
+          return photo;
+      }
+
+      if (person.BiometricData != null || person.BiometricData.FaceCharacteristic == null)
+        return null;
+            
+      ICollection<FaceCharacteristic> faces = person.BiometricData.FaceCharacteristic;
+      FaceCharacteristic fc = person.BiometricData.FaceCharacteristic
+                             .Where(x => x.Photo_Id == photoId).FirstOrDefault();
+      if (fc == null)
+        return null;
+
+      return fc.Photo;
+    }
+    
+
+    public Photo GetDefaultPhoto(Person owner, BioSkyNetDataModel dataContext)
+    {     
+      if (owner.Photos != null && owner.Photos.Count > 0)
+      {
+        Photo photo = owner.Photos.FirstOrDefault();
+        if (photo != null)
+          return photo;
+      }
+
+      if (owner.BiometricData != null || owner.BiometricData.FaceCharacteristic == null)
+        return null;
+
+      ICollection<FaceCharacteristic> faces = owner.BiometricData.FaceCharacteristic;
+      FaceCharacteristic fc = owner.BiometricData.FaceCharacteristic.FirstOrDefault();
+      if (fc == null)
+        return null;
+
+      return fc.Photo;
+    }
+    #endregion
 
     private IProcessorLocator        _locator        ;
     private ProtoMessageConvertor    _convertor      ;
-    private readonly PhotoDataClient _photoDataClient;
+    private readonly BiometricDataClient _biometricDataClient;
     private BioService.RawIndexes    _rawIndexes     ;
     private readonly CardDataClient  _cardDataClient ;
   }

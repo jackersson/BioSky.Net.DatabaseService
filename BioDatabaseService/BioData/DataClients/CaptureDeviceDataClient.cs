@@ -22,84 +22,76 @@ namespace BioData.DataClients
       }
     }
 
-    public BioService.CaptureDevice Add(Location existingLocation, BioService.CaptureDevice item, BioSkyNetDataModel dataContext)
+    public BioService.CaptureDevice Add(Location existingLocation, BioService.CaptureDevice request, BioSkyNetDataModel dataContext)
     {
-      BioService.CaptureDevice newProtoCaptureDevice = new BioService.CaptureDevice() { };
-      if (item == null)
-        return newProtoCaptureDevice;
+      BioService.CaptureDevice response = new BioService.CaptureDevice() { Dbresult = BioService.Result.Failed
+                                                                         , EntityState = BioService.EntityState.Added };
+      if (request == null || existingLocation == null)
+        return response;
 
       try
       {
-        CaptureDevice existingCaptureDevice = dataContext.CaptureDevice.Where(x => x.Device_Name == item.Devicename).FirstOrDefault();
+        CaptureDevice existingDevice = dataContext.CaptureDevice.Where(x => x.Device_Name == request.Devicename).FirstOrDefault();
 
-        if (existingCaptureDevice == null)        
-          existingCaptureDevice = _convertor.GetCaptureDeviceEntity(item);
+        if (existingDevice == null)        
+          existingDevice = _convertor.GetCaptureDeviceEntity(request);
+        else
+          existingDevice.Location.Clear();
 
-        if (existingLocation.CaptureDevice.Count > 0)
-        {
-          BioService.RawIndexes items = new BioService.RawIndexes();
-          foreach (CaptureDevice cp in existingLocation.CaptureDevice)          
-            items.Indexes.Add(cp.Id);
-
-          Remove(items, dataContext);
-        }
-        
-        existingLocation.CaptureDevice.Add(existingCaptureDevice);    
+        existingLocation.CaptureDevice = existingDevice;    
         
         int affectedRows = dataContext.SaveChanges();
         if (affectedRows > 0)        
-          newProtoCaptureDevice.Id = existingCaptureDevice.Id;              
+          response.Dbresult = BioService.Result.Success;              
       }
       catch (Exception ex) {
         Console.WriteLine(ex.Message);
       }
 
-      return newProtoCaptureDevice;
+      return response;
     }
 
-    public BioService.RawIndexes Remove(BioService.RawIndexes items)
+    public void Update(Location entity, BioService.CaptureDevice request, BioService.Location response, BioSkyNetDataModel dataContext)
     {
-      using (var dataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
-      {
-        return Remove(items, dataContext);
-      }
+      if (request == null)
+        return;
+
+      if (request.EntityState == BioService.EntityState.Added)
+        response.CaptureDevice = Add(entity, request, dataContext);
+      else if (request.EntityState == BioService.EntityState.Deleted)
+        Remove(entity, response, dataContext);
     }
 
-    public BioService.RawIndexes Remove(BioService.RawIndexes items, BioSkyNetDataModel dataContext)
+    public void Remove (Location entity, BioService.Location response, BioSkyNetDataModel dataContext)
     {
-      BioService.RawIndexes removedItems = new BioService.RawIndexes();
-      if (items == null || items.Indexes.Count <= 0)
-        return removedItems;
-
+      bool hasResponse = response != null;
+      if (entity == null)
+        return;
+      if (hasResponse)
+        response.CaptureDevice = new BioService.CaptureDevice() { EntityState = BioService.EntityState.Deleted, Dbresult = BioService.Result.Failed };
       try
       {
-        var existingItems = dataContext.CaptureDevice.Where(x => items.Indexes.Contains(x.Id));
+        CaptureDevice existingEntity = entity.CaptureDevice;
 
-        if (existingItems == null)
-          return removedItems;
-
-        foreach(CaptureDevice captureDevice in existingItems)        
-          captureDevice.Location_Id = null;
-
-        var deletedItems = dataContext.CaptureDevice.RemoveRange(existingItems);
-        int affectedRows = dataContext.SaveChanges();
-        if (deletedItems.Count() == affectedRows)
-          return items;
-        else
+        if (existingEntity == null)
         {
-          foreach (long id in items.Indexes)
-          {
-            if (dataContext.CaptureDevice.Find(id) == null)
-              removedItems.Indexes.Add(id);
-          }
+          if (hasResponse)
+            response.CaptureDevice.Dbresult = BioService.Result.Success;
+          return;
         }
+
+        dataContext.CaptureDevice.Remove(existingEntity);
+        int affectedRows = dataContext.SaveChanges();
+        if (affectedRows <= 0)
+          return;
+
+        if (hasResponse)
+          response.CaptureDevice.Dbresult = BioService.Result.Success;            
       }
-      catch (Exception ex) {
+      catch (Exception ex)  {
         Console.WriteLine(ex.Message);
       }
-
-      return removedItems;
-    }
+    }    
 
     private IProcessorLocator _locator;
     private ProtoMessageConvertor _convertor;

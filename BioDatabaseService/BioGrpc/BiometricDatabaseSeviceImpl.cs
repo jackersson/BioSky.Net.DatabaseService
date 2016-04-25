@@ -9,16 +9,19 @@ namespace BioGrpc
   public class BiometricDatabaseSeviceImpl : BiometricDatabaseSevice.IBiometricDatabaseSevice
   {   
     private readonly BioSkyNetRepository _database;
-    public BiometricDatabaseSeviceImpl(BioSkyNetRepository database)
+    private readonly BioClientsEngine    _client  ;
+    public BiometricDatabaseSeviceImpl(BioSkyNetRepository database, BioClientsEngine client )
     {
       _database = database;
+
+      _client   = client;
     }
 
     public Task<Response> AddSocket(SocketConfiguration request, ServerCallContext context)
     {
       throw new NotImplementedException();
-    }    
-
+    }
+    #region person
     public Task<PersonList> PersonSelect(QueryPersons request, ServerCallContext context)
     {
       return Task.FromResult(_database.PersonDataClient.Select());
@@ -38,17 +41,26 @@ namespace BioGrpc
     {
       return Task.FromResult(_database.PersonDataClient.Remove(request));
     }
+    #endregion
 
+    #region cards
     public Task<Card> AddCard(Card request, ServerCallContext context)
     {
       return Task.FromResult(_database.CardsDataClient.Add(request));
     }
 
-    public Task<RawIndexes> RemoveCards(RawIndexes request, ServerCallContext context)
+    public Task<CardList> RemoveCards(CardList request, ServerCallContext context)
     {
       return Task.FromResult(_database.CardsDataClient.Remove(request));
     }
 
+    public Task<Card> RemoveCard(Card request, ServerCallContext context)
+    {
+      return Task.FromResult(_database.CardsDataClient.Remove(request));
+    }
+    #endregion
+
+    #region photos
     public Task<PhotoList> SelectPhotos(QueryPhoto request, ServerCallContext context)
     {
       return Task.FromResult(_database.PhotosDataClient.Select(request));
@@ -64,10 +76,11 @@ namespace BioGrpc
       return Task.FromResult(_database.PhotosDataClient.Remove(request));
     }
 
-    Task<Response> BiometricDatabaseSevice.IBiometricDatabaseSevice.SetThumbnail(Photo request, ServerCallContext context)
+    public Task<Photo> SetThumbnail(long personId, long photoId, ServerCallContext context)
     {
-      return Task.FromResult(_database.PersonDataClient.SetThumbnail(request));
+      return Task.FromResult(_database.PersonDataClient.SetThumbnail(personId, photoId));
     }
+    #endregion
 
     public Task<VisitorList> SelectVisitors(QueryVisitors request, ServerCallContext context)
     {
@@ -81,7 +94,8 @@ namespace BioGrpc
 
     public Task<Visitor> AddVisitor(Visitor request, ServerCallContext context)
     {
-      return Task.FromResult(_database.VisitorsDataClient.Add(request));
+      throw new NotImplementedException();
+      //return Task.FromResult(_database.VisitorsDataClient.Add(request));
     }
 
     public Task<RawIndexes> RemoveVisitors(RawIndexes request, ServerCallContext context)
@@ -103,12 +117,63 @@ namespace BioGrpc
     {
       return Task.FromResult(_database.LocationsDataClient.Update(request));
     }
+    
 
-    public Task<RawIndexes> RemoveLocations(RawIndexes request, ServerCallContext context)
+    public Task<Location> RemoveLocation(Location request, ServerCallContext context)
     {
       return Task.FromResult(_database.LocationsDataClient.Remove(request));
     }
 
-    
+    public Task<FacialImage> AddFace(FacialImage request, ServerCallContext context)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Task<FacialImage> RemoveFace(FacialImage request, ServerCallContext context)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Task<FacialImage> UpdateFace(FacialImage request, ServerCallContext context)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Task<FingerprintImage> AddFingerprint(FingerprintImage request, ServerCallContext context)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Task<FingerprintImage> RemoveFingerprint(FingerprintImage request, ServerCallContext context)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Task<FingerprintImage> UpdateFingerprint(FingerprintImage request, ServerCallContext context)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Task<Response> SetThumbnail(Photo request, ServerCallContext context)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Task<Visitor> AddVisitor(FullVisitorData request, ServerCallContext context)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Task<Response> AddClient(BioClient request, ServerCallContext context)
+    {
+      return Task.FromResult(_client.Add(request));
+    }
+
+    public Task<Response> RemoveClient(BioClient request, ServerCallContext context)
+    {
+      throw new NotImplementedException();
+    }
+
+   
   }
 }

@@ -9,16 +9,20 @@ namespace BioData.DataModels
     [Table("CaptureDevice")]
     public partial class CaptureDevice
     {
-        public long Id { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public CaptureDevice()
+        {
+            Location = new HashSet<Location>();
+        }
 
-        [Column("Location Id")]
-        public long? Location_Id { get; set; }
+        public long Id { get; set; }
 
         [Column("Device Name")]
         [Required]
         [StringLength(50)]
         public string Device_Name { get; set; }
 
-        public virtual Location Location { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Location> Location { get; set; }
     }
 }

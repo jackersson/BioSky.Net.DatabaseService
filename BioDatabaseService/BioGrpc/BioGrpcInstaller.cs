@@ -10,6 +10,7 @@ namespace BioGrpc
     public void Install(IWindsorContainer container, IConfigurationStore store)
     {
       try  {
+        container.Register(Component.For<BioClientsEngine>());
         container.Register(Component.For<BioServiceManager>());
       }
       catch (Exception ex) {

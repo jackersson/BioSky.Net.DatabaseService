@@ -6,6 +6,8 @@ namespace BioData.Utils
 {
   public class ProtoMessageConvertor
   {
+
+    #region person
     public BioService.Person GetPersonProto(Person entity)
     {
       if (entity == null)
@@ -16,7 +18,7 @@ namespace BioData.Utils
       proto.Id        = entity.Id;
       proto.Firstname = entity.First_Name_;
       proto.Lastname  = entity.Last_Name_;
-      proto.Gender    = (BioService.Person.Types.Gender)entity.Gender;
+      proto.Gender    = (BioService.Gender)entity.Gender;
 
       if (entity.Country != null)
         proto.Country = entity.Country;
@@ -30,27 +32,27 @@ namespace BioData.Utils
       if (entity.Email != null)
         proto.Email = entity.Email;
 
-      proto.Rights = (BioService.Person.Types.Rights)entity.Rights;
+       proto.Rights = (BioService.Rights)entity.Rights;
 
       if (entity.Date_Of_Birth.HasValue)
         proto.Dateofbirth = entity.Date_Of_Birth.Value.Ticks;
 
-      if (entity.Photo != null)
-      {
-        proto.Thumbnail = GetPhotoProto(entity.Photo);
-        proto.Photoid   = entity.Photo.Id;
-      }
+      if (entity.Thumbnail != null)      
+        proto.Thumbnailid = entity.Thumbnail.Id;
 
-      if ( entity.PhotoCollection != null && entity.PhotoCollection.Count > 0)
-      {
-        foreach (Photo photo in entity.PhotoCollection)
-          proto.Photos.Add(GetPhotoProto(photo));
-      }
-
+      if (entity.BiometricData != null)      
+        proto.BiometricData = GetBiometricDataProto(entity.BiometricData);
+      
       if (entity.Card != null && entity.Card.Count > 0)
       {
         foreach (Card card in entity.Card)
           proto.Cards.Add(GetCardProto(card));
+      }
+
+      if (entity.Photos != null && entity.Photos.Count > 0)
+      {
+        foreach (Photo photo in entity.Photos)
+          proto.Photos.Add(GetPhotoProto(photo));
       }
 
       if (entity.Criminal != null)            
@@ -65,8 +67,7 @@ namespace BioData.Utils
         return null;
 
       Person entity  = new Person();
-
-      entity.Id          = proto.Id;
+      
       entity.First_Name_ = proto.Firstname;
       entity.Last_Name_  = proto.Lastname;
       entity.Gender      = (byte)proto.Gender;
@@ -76,31 +77,84 @@ namespace BioData.Utils
       entity.Comments    = proto.Comments;
       entity.Rights      = (byte)proto.Rights;
 
-      //if (proto.Photoid > 0 && proto.Thumbnail != null)
-         //entity.Photo_Id    = proto.Photoid;
+      if (proto.Thumbnailid > 0)
+        entity.Thumbnail_Id = proto.Thumbnailid;      
 
       DateTime dateofbirth = new DateTime(proto.Dateofbirth);
       if (dateofbirth > DateTime.MinValue && dateofbirth < DateTime.MaxValue)
-        entity.Date_Of_Birth = dateofbirth;
-     // entity.Thumbnail = proto.Thumbnailid;
+        entity.Date_Of_Birth = dateofbirth;    
 
       return entity;
     }
+    #endregion
 
-    public BioService.AccessDevice GetAccessDeviceProto(AccessDevice entity)
+    #region BiometricData
+    public BioService.BiometricData GetBiometricDataProto(BiometricData entity)
     {
       if (entity == null)
         return null;
 
-      BioService.AccessDevice proto = new BioService.AccessDevice();
+      BioService.BiometricData proto = new BioService.BiometricData();
 
-      //proto.Id = entity.Id;
-      proto.Portname = entity.PortName;
-      proto.Type = (BioService.AccessDevice.Types.AccessDeviceType)entity.Location_Type;
+      foreach (FaceCharacteristic fc in entity.FaceCharacteristic)
+        proto.Faces.Add(GetFaceCharacteristicProto(fc));
 
-      if (entity.Location_Id.HasValue)
-        proto.Locationid = entity.Location_Id.Value;
+      foreach (FingerprintCharacteristic fc in entity.FingerprintCharacteristic)
+        proto.Fingerprints.Add(GetFingerprintCharacteristicProto(fc));      
 
+      return proto;
+    }
+
+    public BiometricData GetBiometricDataEntity(BioService.BiometricData proto)
+    {
+      if (proto == null)
+        return null;
+
+      BiometricData entity = new BiometricData();
+      
+      foreach (BioService.FaceCharacteristic fc in proto.Faces)      
+          entity.FaceCharacteristic.Add(GetFaceCharacteristicEntity(fc));             
+            
+      foreach (BioService.FingerprintCharacteristic fc in proto.Fingerprints)
+        entity.FingerprintCharacteristic.Add(GetFingerprintCharacteristicEntity(fc));
+
+      return entity;
+    }
+    #endregion
+
+    #region fingerprintDevice
+    public BioService.FingerprintDevice GetFingerprintDeviceProto(FingerprintDevice entity)
+    {
+      if (entity == null)
+        return null;
+
+      BioService.FingerprintDevice proto = new BioService.FingerprintDevice() { Devicename = entity.DeviceName 
+                                                                              , SerialNumber = entity.SerialNumber };
+     
+      return proto;
+    }
+    public FingerprintDevice GetFingerprintDeviceEntity(BioService.FingerprintDevice proto)
+    {
+      if (proto == null)
+        return null;
+
+      FingerprintDevice entity = new FingerprintDevice();
+      
+      entity.DeviceName   = proto.Devicename;
+      entity.SerialNumber = proto.SerialNumber;
+    
+      return entity;
+    }
+    #endregion
+
+    #region accessDevice
+    public BioService.AccessDevice GetAccessDeviceProto(AccessDevice entity)
+    {
+      if (entity == null || string.IsNullOrEmpty( entity.PortName ))
+        return null;
+
+      BioService.AccessDevice proto = new BioService.AccessDevice() { Portname = entity.PortName };
+  
 
       return proto;
     }
@@ -109,51 +163,37 @@ namespace BioData.Utils
       if (proto == null)
         return null;
 
-      AccessDevice entity = new AccessDevice();
+      AccessDevice entity = new AccessDevice();     
 
-      entity.Id = proto.Id;
-      entity.PortName = proto.Portname;
-      entity.Location_Type = (byte)proto.Type;
-      entity.Location_Id = proto.Locationid;
-
+      entity.PortName   = proto.Portname; 
+     
       return entity;
     }
+    #endregion
 
-
-
-
+    #region captureDevice
     public BioService.CaptureDevice GetCaptureDeviceProto(CaptureDevice entity)
     {
-      if (entity == null)
+      if (entity == null || string.IsNullOrEmpty( entity.Device_Name ))
         return null;
 
-      BioService.CaptureDevice proto = new BioService.CaptureDevice();
+      BioService.CaptureDevice proto = new BioService.CaptureDevice() { Devicename = entity.Device_Name };
     
-      //proto.Id = entity.Id;
-      proto.Devicename = entity.Device_Name;
-
-      if (entity.Location_Id.HasValue)
-        proto.Locationid = entity.Location_Id.Value;
-
       return proto;
     }
 
     public CaptureDevice GetCaptureDeviceEntity(BioService.CaptureDevice proto)
     {
-      if (proto == null)
+      if (proto == null || string.IsNullOrEmpty(proto.Devicename))
         return null;
 
-      CaptureDevice entity = new CaptureDevice();
-
-      entity.Id = proto.Id;
-      entity.Device_Name = proto.Devicename;
-      entity.Location_Id = proto.Locationid;
+      CaptureDevice entity = new CaptureDevice() { Device_Name = proto.Devicename };
 
       return entity;
     }
+    #endregion
 
-
-
+    #region Card
     public BioService.Card GetCardProto(Card entity)
     {
       if (entity == null)
@@ -188,7 +228,9 @@ namespace BioData.Utils
 
       return entity;
     }
+    #endregion
 
+    #region location
     public BioService.Location GetLocationProto(Location entity)
     {
       if (entity == null)
@@ -199,25 +241,33 @@ namespace BioData.Utils
       proto.Id           = entity.Id;
       proto.LocationName = entity.Location_Name;
       proto.Description  = entity.Description;
+      proto.MacAddress   = entity.MacAddress;
+
+      #region accessInfo
+      BioService.AccessInfo accessInfo = new BioService.AccessInfo();
 
       if (entity.Access_Type.HasValue)
-        proto.AccessType = (BioService.Location.Types.AccessType)entity.Access_Type.Value;
+        accessInfo.AccessType = (BioService.AccessInfo.Types.AccessType)entity.Access_Type.Value;
      
-      if (    proto.AccessType == BioService.Location.Types.AccessType.Custom
-           && entity.PersonAccessCollection != null
-           && entity.PersonAccessCollection.Count > 0  )
+      if (accessInfo.AccessType == BioService.AccessInfo.Types.AccessType.Custom
+           && entity.PersonAccess != null
+           && entity.PersonAccess.Count > 0  )
       {
-        foreach (PersonAccess pa in entity.PersonAccessCollection)
-          proto.Persons.Add(new BioService.Person() { Id = pa.Person_Id });
+        foreach (PersonAccess pa in entity.PersonAccess)
+          accessInfo.Persons.Add(new BioService.Person() { Id = pa.Person_Id });
       }
 
-      CaptureDevice capDev = entity.CaptureDevice.FirstOrDefault();
-      if (capDev != null)
-        proto.CaptureDevice = GetCaptureDeviceProto(capDev);
+      proto.AccessInfo = accessInfo;
+      #endregion
 
-      AccessDevice accDev = entity.AccessDevice.FirstOrDefault();
-      if (accDev != null)
-        proto.AccessDevice = GetAccessDeviceProto(accDev);
+      if (entity.CaptureDevice != null)
+        proto.CaptureDevice = GetCaptureDeviceProto(entity.CaptureDevice);
+
+      if (entity.AccessDevice != null)
+        proto.AccessDevice = GetAccessDeviceProto(entity.AccessDevice);
+
+      if (entity.FingerprintDevice != null)
+        proto.FingerprintDevice = GetFingerprintDeviceProto(entity.FingerprintDevice);
 
       return proto;
     }
@@ -229,15 +279,27 @@ namespace BioData.Utils
 
       Location entity = new Location();
       
-      entity.Id = proto.Id;
-      entity.Location_Name = proto.LocationName;
+      if ( proto.Id > 0)
+        entity.Id = proto.Id;
+      
+      if ( !string.IsNullOrEmpty(proto.LocationName))
+        entity.Location_Name = proto.LocationName;
+
       entity.Description   = proto.Description;
-      entity.Access_Type   = (byte)proto.AccessType;
+
+      if (!string.IsNullOrEmpty(proto.LocationName))
+        entity.MacAddress = proto.MacAddress;
+
+      if (proto.AccessInfo != null)
+        entity.Access_Type   = (byte)proto.AccessInfo.AccessType;
 
       return entity;
     }
+    #endregion
 
+   
 
+    #region Visitor
     public BioService.Visitor GetVisitorProto(Visitor entity)
     {
       if (entity == null)
@@ -251,11 +313,8 @@ namespace BioData.Utils
       proto.CardNumber = entity.Card_Number;
       proto.Status     = (BioService.Result)entity.Status;
 
-      if (entity.FullPhoto != null)
-        proto.Fullphoto = GetPhotoProto(entity.FullPhoto);
-
-      if (entity.CropedPhoto != null)
-        proto.Cropedphoto = GetPhotoProto(entity.CropedPhoto);
+      if (entity.BiometricData != null)
+        proto.BiometricData = GetBiometricDataProto(entity.BiometricData);
   
       if (entity.Person_ID.HasValue)
         proto.Personid = entity.Person_ID.Value;
@@ -269,39 +328,59 @@ namespace BioData.Utils
         return null;
 
       Visitor entity = new Visitor();
-      if (proto.Id > 0)
-      entity.Id = proto.Id;
-      entity.Location_Id = proto.Locationid;
+      
+      if (proto.Id > 0 )
+        entity.Id           = proto.Id;
+
+      entity.Location_Id    = proto.Locationid;
       entity.Detection_Time = new DateTime(proto.Time);
-      entity.Card_Number = proto.CardNumber;
-      //entity.Photo_ID  = proto.Photoid;
-      entity.Person_ID = proto.Personid;
+      entity.Card_Number    = proto.CardNumber;
+ 
+      if (proto.Personid > 0)
+        entity.Person_ID = proto.Personid;
+
       entity.Status    = (byte)proto.Status;
       return entity;
     }
+    #endregion
+      
+    #region fingerprintCharacteristic
 
-    public BioService.PortraitCharacteristic GetPortraitCharacteristicProto(PortraitCharacteristic entity)
+    public BioService.FingerprintCharacteristic GetFingerprintCharacteristicProto(FingerprintCharacteristic entity)
     {
       if (entity == null)
         return null;
 
-      BioService.PortraitCharacteristic proto = new BioService.PortraitCharacteristic();
+      BioService.FingerprintCharacteristic proto = new BioService.FingerprintCharacteristic();
 
-      if ( entity.Age.HasValue )
-        proto.Age = entity.Age.Value;
-
-      if (entity.Face_Count.HasValue)
-        proto.FacesCount = entity.Face_Count.Value;
-
-      if ( entity.FaceCharacteristic != null && entity.FaceCharacteristic.Count > 0)
-      {
-        foreach (FaceCharacteristic fc in entity.FaceCharacteristic)
-          proto.Faces.Add(GetFaceCharacteristicProto(fc));
-      }
-     
+      proto.Position = (BioService.Finger)entity.Position;
+      /*
+      to load with byte string
+      proto.FirUrl = entity.FirUrl;
+      proto.FirBytestring = null;
+      */
       return proto;
     }
 
+    public FingerprintCharacteristic GetFingerprintCharacteristicEntity( BioService.FingerprintCharacteristic proto)
+    {
+      if (proto == null)
+        return null;
+
+      FingerprintCharacteristic entity = new FingerprintCharacteristic();
+
+      entity.Position = (byte)proto.Position;
+      
+      /*
+      to load with byte string
+      proto.FirUrl = entity.FirUrl;
+      proto.FirBytestring = null;
+      */
+      return entity;
+    }
+    #endregion
+    
+    #region faceCharacteristics
     public BioService.FaceCharacteristic GetFaceCharacteristicProto(FaceCharacteristic entity)
     {
       if (entity == null)
@@ -310,10 +389,21 @@ namespace BioData.Utils
       BioService.FaceCharacteristic proto = new BioService.FaceCharacteristic();
 
       if (entity.Width.HasValue)
-        proto.Width = (long)entity.Width.Value;
+        proto.Width = (float)entity.Width.Value;
 
-      if (entity.FaceBiometricLocation != null)
-        proto.Location = GetBiometricLocationProto(entity.FaceBiometricLocation);
+      if (entity.Age.HasValue)
+        proto.Age = entity.Age.Value;
+
+      if (entity.Gender.HasValue)
+        proto.Gender = (BioService.Gender)entity.Gender;
+
+      /*
+      to load with byte string
+      proto.FirUrl = entity.FirUrl;
+      proto.FirBytestring = null;
+      */
+      if (entity.BiometricLocation != null)
+        proto.Location = GetBiometricLocationProto(entity.BiometricLocation);
 
       if (entity.EyesCharacteristic != null)
         proto.Eyes = GetEyesCharacteristicProto(entity.EyesCharacteristic);
@@ -321,6 +411,41 @@ namespace BioData.Utils
       return proto;
     }
 
+    public FaceCharacteristic GetFaceCharacteristicEntity(BioService.FaceCharacteristic proto)
+    {      
+      if (proto == null)
+        return null;
+
+      FaceCharacteristic entity = new FaceCharacteristic();
+
+      if (proto.Age > 0)
+        entity.Age = (byte)proto.Age;
+
+      if (proto.Width > 0)
+        entity.Width = proto.Width;
+
+      entity.Gender = (byte)proto.Gender;
+
+      if (proto.Location != null)
+        entity.BiometricLocation = GetBiometricLocationEntity(proto.Location);
+  
+      if (proto.Eyes != null)      
+        entity.EyesCharacteristic = GetEyesCharacteristicEntity(proto.Eyes);
+
+      if (proto.Photoid > 0)
+        entity.Photo_Id = proto.Photoid;
+              
+      /*
+      to load with byte string
+      proto.FirUrl = entity.FirUrl;
+      proto.FirBytestring = null;
+      */         
+
+      return entity;   
+    }
+    #endregion
+
+    #region eyesCharacteristic
     public BioService.EyesCharacteristic GetEyesCharacteristicProto(EyesCharacteristic entity)
     {
       if (entity == null)
@@ -337,6 +462,24 @@ namespace BioData.Utils
        return proto;
     }
 
+    public EyesCharacteristic GetEyesCharacteristicEntity(BioService.EyesCharacteristic proto)
+    {
+      if (proto == null)
+        return null;
+
+      EyesCharacteristic entity = new EyesCharacteristic();
+
+      if (proto.LeftEye != null)
+        entity.LeftEyeBiometricLocation = GetBiometricLocationEntity(proto.LeftEye);
+
+      if (proto.RightEye != null)
+        entity.RightEyeBiometricLocation = GetBiometricLocationEntity(proto.RightEye);
+
+      return entity;
+    }
+    #endregion
+    
+    #region BiometricLocation
     public BioService.BiometricLocation GetBiometricLocationProto(BiometricLocation entity)
     {
       if (entity == null)
@@ -351,9 +494,22 @@ namespace BioData.Utils
       return proto;
     }
 
+    public BiometricLocation GetBiometricLocationEntity(BioService.BiometricLocation proto)
+    {
+      if (proto == null)
+        return null;
 
+      BiometricLocation entity = new BiometricLocation();
 
+      entity.XPos       = proto.Xpos      ;
+      entity.YPos       = proto.Ypos      ;
+      entity.Confidence = proto.Confidence;      
 
+      return entity;
+    }
+    #endregion
+    
+    #region Photo
     public BioService.Photo GetPhotoProto(Photo entity)
     {
       if (entity == null)
@@ -370,35 +526,16 @@ namespace BioData.Utils
         proto.OriginType = (BioService.PhotoOriginType)entity.Origin_Type;
             
       proto.PhotoUrl = entity.Photo_Url;
-      
-      if (entity.Person_Id.HasValue)
-        proto.Personid = entity.Person_Id.Value;
-
+       
       if (entity.Datetime.HasValue)
         proto.Datetime = entity.Datetime.Value.Ticks;
 
-      if (entity.Width.HasValue)
-        proto.Width = entity.Width.Value;
+      if (entity.Owner_Id.HasValue)
+        proto.OwnerId = entity.Owner_Id.Value;
+           
+      proto.Width  = entity.Width ;     
+      proto.Height = entity.Height;
 
-      if (entity.Height.HasValue)
-        proto.Height = entity.Height.Value;
-
-      if (entity.PortraitCharacteristic != null)
-        proto.PortraitCharacteristic = GetPortraitCharacteristicProto(entity.PortraitCharacteristic);
-
-      return proto;
-    }
-
-
-    public BioService.Photo GetFullPhotoProto(Photo entity)
-    {
-      if (entity == null)
-        return null;
-
-      BioService.Photo proto = GetPhotoProto(entity);
-      Google.Protobuf.ByteString description = _utils.GetFileDescription(_utils.LocalStorage + proto.PhotoUrl);
-      if (description != null)
-        proto.Bytestring = description;
       return proto;
     }
 
@@ -409,17 +546,28 @@ namespace BioData.Utils
 
       Photo entity = new Photo();
 
-      entity.Id = proto.Id;
+      if (proto.Id > 0)
+        entity.Id          = proto.Id;
+
       entity.Size_Type   = (byte)proto.SizeType;
       entity.Origin_Type = (byte)proto.OriginType;
       entity.Width       = (int)proto.Width;
       entity.Height      = (int)proto.Height;
-      entity.Datetime    = new DateTime(proto.Datetime);     
-      entity.Person_Id   = proto.Personid;
+
+      if ( proto.Datetime > 0)
+        entity.Datetime    = new DateTime(proto.Datetime);
+
+      if (proto.OwnerId > 0)
+        entity.Owner_Id    = proto.OwnerId;
+
+      if (!string.IsNullOrEmpty(proto.PhotoUrl))
+        entity.Photo_Url = proto.PhotoUrl;
 
       return entity;
     }
-
+    #endregion
+        
+    #region criminal
     public BioService.Criminal GetCriminalProto(Criminal entity)
     {
       if (entity == null)
@@ -444,6 +592,17 @@ namespace BioData.Utils
       //entity.Person_Id = proto.Personid;
 
       return entity;
+    }
+    #endregion
+
+
+    public bool IsDeleteState( string field )
+    {
+      if (string.IsNullOrEmpty(field))
+        return false;
+
+      string deleteState = "delete";
+      return deleteState.Equals(field);
     }
 
     private readonly IOUtils _utils = new IOUtils();

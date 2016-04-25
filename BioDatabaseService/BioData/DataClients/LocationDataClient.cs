@@ -1,36 +1,28 @@
 ﻿using BioContracts;
 using BioData.DataModels;
 using BioData.Utils;
-using Google.Protobuf.Collections;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BioData.DataClients
 {
   public class LocationDataClient
   {
-    public LocationDataClient( IProcessorLocator locator
-                              , AccessDeviceDataClient  accessDeviceDataClient
-                              , CaptureDeviceDataClient captureDeviceDataClient
-                              , PersonAccessDataClient  personAccessDataClient 
-                              , VisitorDataClient       visitorDataClient
-      
-      )
+    public LocationDataClient(  IProcessorLocator           locator
+                              , AccessDeviceDataClient      accessDeviceDataClient
+                              , CaptureDeviceDataClient     captureDeviceDataClient
+                              , FingerprintDeviceDataClient fingerprintDeviceClient
+                              , PersonAccessDataClient      personAccessDataClient 
+                              , VisitorDataClient           visitorDataClient        )
     {
       _locator = locator;
-      _convertor                = new ProtoMessageConvertor();
-      _rawIndexes               = new BioService.RawIndexes();
-      _accessDevicesRawIndexes  = new BioService.RawIndexes();
-      _caprureDevicesRawIndexes = new BioService.RawIndexes();
-      _visitorsRawIndexes       = new BioService.RawIndexes();
+      _convertor                   = new ProtoMessageConvertor();   
 
-    _accessDeviceDataClient  = accessDeviceDataClient ;
-      _captureDeviceDataClient = captureDeviceDataClient;
-      _personAccessDataClient  = personAccessDataClient ;
-      _visitorDataClient       = visitorDataClient;
+      _accessDeviceDataClient      = accessDeviceDataClient ;
+      _captureDeviceDataClient     = captureDeviceDataClient;
+      _fingerprintDeviceDataClient = fingerprintDeviceClient;
+      _personAccessDataClient      = personAccessDataClient ;
+      _visitorDataClient           = visitorDataClient      ;
     }
 
     public BioService.Location Add(BioService.Location location)
@@ -41,65 +33,38 @@ namespace BioData.DataClients
       }
     }
 
-    public BioService.Location Add(BioService.Location location, BioSkyNetDataModel dataContext)
+   
+    public BioService.Location Add(BioService.Location request, BioSkyNetDataModel dataContext)
     {
-      BioService.Location newProtoLocation = new BioService.Location { Dbresult = BioService.Result.Failed };
-
-      //check on access devices vs capture devices vs person accesability
-      if (location == null || ( location.CaptureDevice == null && location.AccessDevice == null) )
-        return newProtoLocation;
+      BioService.Location response = new BioService.Location { Dbresult = BioService.Result.Failed, EntityState = BioService.EntityState.Added };
+      if (request == null || ( request.CaptureDevice == null && request.AccessDevice == null && request.FingerprintDevice == null) )
+        return response;
 
       try
-      {
-        Location existingLocation = dataContext.Location.Where( x => x.Location_Name == location.LocationName ).FirstOrDefault();
-
-        if (existingLocation != null)
-          return newProtoLocation;
-
+      {        
+        if (LocationExists(request.LocationName, request.MacAddress, dataContext))
+          return response;
   
-        Location newLocation = _convertor.GetLocationEntity(location);
+        Location newLocation = _convertor.GetLocationEntity(request);
         dataContext.Location.Add(newLocation);
         int affectedRows = dataContext.SaveChanges();
         if (affectedRows <= 0)
-          return newProtoLocation;
+          return response;
 
-        newProtoLocation.Dbresult = BioService.Result.Success;
-        newProtoLocation.Id       = newLocation.Id;
+        response.Dbresult = BioService.Result.Success;
+        response.Id       = newLocation.Id;
 
-        if (location.AccessDevice != null )
-        {
-          BioService.AccessDevice newAccessDevice = _accessDeviceDataClient.Add(newLocation, location.AccessDevice, dataContext);
-          if (newAccessDevice.Id > 0)
-            newProtoLocation.AccessDevice = newAccessDevice;
-        }
-
-        if (location.CaptureDevice != null)
-        {
-          BioService.CaptureDevice newCaptureDevice = _captureDeviceDataClient.Add(newLocation, location.CaptureDevice, dataContext);
-          if (newCaptureDevice.Id > 0)
-            newProtoLocation.CaptureDevice  = newCaptureDevice;
-        }
-
-        newProtoLocation.Persons.Add(_personAccessDataClient.Update(newLocation, location, dataContext));
-
-        if (newProtoLocation.Persons.Count == 0)
-          newLocation.Access_Type = (byte)BioService.Location.Types.AccessType.None;
-        else if (newProtoLocation.Persons.Count == dataContext.Person.Count())
-          newLocation.Access_Type = (byte)BioService.Location.Types.AccessType.All;
-        else
-          newLocation.Access_Type = (byte)BioService.Location.Types.AccessType.Custom;
-
-        newProtoLocation.AccessType = (BioService.Location.Types.AccessType) newLocation.Access_Type;
-
-        dataContext.SaveChanges();
+        UpdateDevices(newLocation, request, response, dataContext);
+        
+        response.AccessInfo = _personAccessDataClient.Update(newLocation, request.AccessInfo, dataContext);      
       }
       catch (Exception ex) {
         Console.WriteLine(ex.Message);
       }
 
-      return newProtoLocation;
+      return response;
     }
-
+    
     public BioService.Location Update(BioService.Location location)
     {
       using (var dataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
@@ -107,182 +72,117 @@ namespace BioData.DataClients
         return Update(location, dataContext);
       }
     }
-
-    public BioService.Location Update(BioService.Location location, BioSkyNetDataModel dataContext)
+    
+    public BioService.Location Update(BioService.Location request, BioSkyNetDataModel dataContext)
     {
-      BioService.Location updatedProtoLocation = new BioService.Location { Dbresult = BioService.Result.Failed };
-      if (location == null)
-        return updatedProtoLocation;
+      BioService.Location response = new BioService.Location { Id = request.Id
+                                                             , Dbresult = BioService.Result.Failed
+                                                             , EntityState = BioService.EntityState.Modified };
 
+      bool hasMacAddress = !string.IsNullOrEmpty(request.MacAddress);
+      if (request == null || !hasMacAddress)
+        return response;
+      
       try
       {
-        Location existingLocation = dataContext.Location.Find(location.Id);
+        Location existingLocation = dataContext.Location.Find(request.Id);
 
         if (existingLocation == null)
-          return updatedProtoLocation;
+          return response;
 
-        if (location.LocationName != "")
-          existingLocation.Location_Name = location.LocationName;
+        #region validation
+             
+        if (!string.IsNullOrEmpty(request.LocationName) && hasMacAddress)
+        {
+          string targetLocationName = request.LocationName;
+          string targetMacAddress   = request.MacAddress  ;
 
-        if (location.Description != "")
-          existingLocation.Description = location.Description;
+          if (!LocationExists(targetLocationName, targetMacAddress, dataContext))
+          {
+            existingLocation.Location_Name = targetLocationName;
+            existingLocation.MacAddress    = targetMacAddress  ;
+          }
+          else
+            return response;
+        }    
+               
+        if (!string.IsNullOrEmpty(request.Description))
+          existingLocation.Description = _convertor.IsDeleteState(request.Description) ? string.Empty : request.Description;
 
-        byte accesstype = (byte)location.AccessType;
-        if (accesstype != existingLocation.Access_Type)
-          existingLocation.Access_Type = accesstype;
+        bool accessTypeChanged = false;
+        bool hasAccessInfo     = request.AccessInfo != null;
+        if (hasAccessInfo)
+        {
+          byte accesstype = (byte)request.AccessInfo.AccessType;
+          accessTypeChanged = accesstype != existingLocation.Access_Type;
+          if (accessTypeChanged)
+            existingLocation.Access_Type = accesstype;
+        }       
+        #endregion
 
         int affectedRows = dataContext.SaveChanges();
 
-        if (affectedRows > 0)
-        {
-          if (location.LocationName != "")
-            updatedProtoLocation.LocationName = location.LocationName;
+        //if (affectedRows > 0)
+        response.Dbresult = BioService.Result.Success;        
 
-          if (location.Description != "")
-            updatedProtoLocation.Description  = location.Description ;
+        UpdateDevices(existingLocation, request, response, dataContext);
 
-          if (accesstype != existingLocation.Access_Type)
-            updatedProtoLocation.AccessType = (BioService.Location.Types.AccessType)existingLocation.Access_Type;
-
-          updatedProtoLocation.Dbresult = BioService.Result.Success;
-        }
-
-
-        if (location.AccessDevice != null)
-        {
-          BioService.AccessDevice newAccessDevice = _accessDeviceDataClient.Add(existingLocation, location.AccessDevice, dataContext);
-          if (newAccessDevice.Id > 0)
-          {
-            updatedProtoLocation.AccessDevice = newAccessDevice;
-            updatedProtoLocation.Dbresult = BioService.Result.Success;
-          }
-        }
-
-        if (location.CaptureDevice != null)
-        {
-          BioService.CaptureDevice newCaptureDevice = _captureDeviceDataClient.Add(existingLocation, location.CaptureDevice, dataContext);
-          if (newCaptureDevice.Id > 0)
-          {
-            updatedProtoLocation.CaptureDevice = newCaptureDevice;
-            updatedProtoLocation.Dbresult = BioService.Result.Success;
-          }
-        }
-
-        if(location.EntityState == BioService.EntityState.Modified)
-        {
-          RepeatedField<BioService.Person> results = _personAccessDataClient.Update(existingLocation, location, dataContext);
-          if (results.Count > 0)
-          {
-            updatedProtoLocation.Persons.Add(results);
-            updatedProtoLocation.Dbresult = BioService.Result.Success;
-          }
-          updatedProtoLocation.AccessType = location.AccessType;
-        }
-        updatedProtoLocation.Id          = location.Id;
-        updatedProtoLocation.EntityState = location.EntityState;
-
+        bool needToChangePersonAcceess = accessTypeChanged || ( hasAccessInfo && request.AccessInfo.Persons.Count > 0 );
+        if (needToChangePersonAcceess)
+          response.AccessInfo = _personAccessDataClient.Update(existingLocation, request.AccessInfo, dataContext);        
       }
       catch (Exception ex) {
         Console.WriteLine(ex.Message);
       }
 
-      return updatedProtoLocation;
+      return response;
     }
 
-    public BioService.RawIndexes Remove(BioService.RawIndexes items)
+    public BioService.Location Remove(BioService.Location request)
     {
-      using (var dataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
+      using (var DataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
       {
-        return Remove(items, dataContext);
+        return Remove(request, DataContext);
       }
     }
 
-    public BioService.RawIndexes Remove(BioService.RawIndexes items, BioSkyNetDataModel dataContext)
+    public BioService.Location Remove(BioService.Location request, BioSkyNetDataModel dataContext)
     {
-      BioService.RawIndexes removedItems = new BioService.RawIndexes();
-      if (items == null || items.Indexes.Count <= 0)
-        return removedItems;
+      BioService.Location response = new BioService.Location() { Dbresult = BioService.Result.Failed
+                                                               , EntityState = BioService.EntityState.Deleted };
+      if (request == null)
+        return response;
+
+      response.Id = request.Id;
+
+      request.AccessInfo = new BioService.AccessInfo() { AccessType = BioService.AccessInfo.Types.AccessType.None };
 
       try
       {
-        var existingLocations = dataContext.Location.Where(x => items.Indexes.Contains(x.Id));
-
-        if (existingLocations == null)
-          return removedItems;
-
-        _rawIndexes              .Indexes.Clear();
-        _accessDevicesRawIndexes .Indexes.Clear();
-        _caprureDevicesRawIndexes.Indexes.Clear();
-        _visitorsRawIndexes      .Indexes.Clear();
-
-        Location location = existingLocations.FirstOrDefault();
-
-        if (location == null)
-          return removedItems;
-
-        //AccessDevice
-        foreach (AccessDevice accessDevice in location.AccessDevice)
-          _accessDevicesRawIndexes.Indexes.Add(accessDevice.Id);
-
-        location.AccessDevice.Clear();
-
-        //CaptureDevice
-        foreach (CaptureDevice captureDevice in location.CaptureDevice)
-          _caprureDevicesRawIndexes.Indexes.Add(captureDevice.Id);
-
-        location.CaptureDevice.Clear();   
-
-        //PersonAccess
-        location.Access_Map_Id = null;
-        location.PersonAccess  = null;
-        _rawIndexes.Indexes.Add(location.Id);
-
-        //Visitors
-        foreach (Visitor visitor in location.Visitor)
-          _visitorsRawIndexes.Indexes.Add(visitor.Id);
-
-        location.Visitor.Clear();        
-
-        dataContext.SaveChanges();
-
-        foreach (long id in _rawIndexes.Indexes)
+        var entity = dataContext.Location.Find(request.Id);
+        if (entity == null)
         {
-          BioService.Location locationItem = new BioService.Location()
-          {
-              Id = id
-            , AccessType = BioService.Location.Types.AccessType.None
-          };
-
-          Location currenLocation = existingLocations.Where(x => x.Id == id).FirstOrDefault();
-          if (location != null)
-            _personAccessDataClient.Update(currenLocation, locationItem, dataContext);
+          response.Dbresult = BioService.Result.Success;
+          return response;
         }
 
-        BioService.RawIndexes accessDeviceIndexes = _accessDeviceDataClient.Remove(_accessDevicesRawIndexes);
-        BioService.RawIndexes captureDeviceIndexes = _captureDeviceDataClient.Remove(_caprureDevicesRawIndexes);
-        BioService.RawIndexes visitorsIndexes = _visitorDataClient.Remove(_visitorsRawIndexes);
+        _accessDeviceDataClient     .Remove(entity, null              , dataContext);
+        _captureDeviceDataClient    .Remove(entity, null              , dataContext);
+        _fingerprintDeviceDataClient.Remove(entity, null              , dataContext);
+        _personAccessDataClient     .Update(entity, request.AccessInfo, dataContext);
 
-        var deletedLocations = dataContext.Location.RemoveRange(existingLocations);
+        dataContext.Location.Remove(entity);
         int affectedRows = dataContext.SaveChanges();
-        if (deletedLocations.Count() == affectedRows)
-          return items;
-        else
-        {
-          foreach (long id in items.Indexes)
-          {
-            if (dataContext.Location.Find(id) == null)
-              removedItems.Indexes.Add(id);
-          }
-        }
+        if (affectedRows > 0)        
+          response.Dbresult = BioService.Result.Success;        
       }
-      catch (Exception ex)
-      {
+      catch (Exception ex) {
         Console.WriteLine(ex.Message);
       }
 
-      return removedItems;
+      return response;
     }
-
+      
     public BioService.LocationList Select(BioService.QueryLocations query, BioSkyNetDataModel dataContext)
     {
       BioService.LocationList locations = new BioService.LocationList();
@@ -303,6 +203,22 @@ namespace BioData.DataClients
       return locations;
     }
 
+    private void UpdateDevices(  Location entity
+                               , BioService.Location requested
+                               , BioService.Location response
+                               , BioSkyNetDataModel dataContext)
+    {
+
+      _accessDeviceDataClient     .Update(entity, requested.AccessDevice     , response, dataContext);
+      _captureDeviceDataClient    .Update(entity, requested.CaptureDevice    , response, dataContext);
+      _fingerprintDeviceDataClient.Update(entity, requested.FingerprintDevice, response, dataContext);
+    }
+
+    public bool LocationExists(string locationName, string macAddress, BioSkyNetDataModel dataContext)
+    {
+      return dataContext.Location.Where(x => x.Location_Name == macAddress && x.MacAddress == macAddress).Count() > 0;
+    }
+
     public BioService.LocationList Select(BioService.QueryLocations query)
     {
       using (var DataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
@@ -311,17 +227,15 @@ namespace BioData.DataClients
       }
     }
 
-    private IProcessorLocator _locator;
+    private IProcessorLocator     _locator  ;
     private ProtoMessageConvertor _convertor;
 
-    private readonly AccessDeviceDataClient  _accessDeviceDataClient  ;
-    private readonly CaptureDeviceDataClient _captureDeviceDataClient ;
-    private readonly PersonAccessDataClient  _personAccessDataClient  ;
-    private          BioService.RawIndexes   _rawIndexes              ;
-    private          VisitorDataClient       _visitorDataClient       ;
-    private          BioService.RawIndexes   _accessDevicesRawIndexes ;
-    private          BioService.RawIndexes   _caprureDevicesRawIndexes;
-    private          BioService.RawIndexes   _visitorsRawIndexes      ;
+    private readonly AccessDeviceDataClient      _accessDeviceDataClient     ;
+    private readonly CaptureDeviceDataClient     _captureDeviceDataClient    ;
+    private readonly FingerprintDeviceDataClient _fingerprintDeviceDataClient;
+    private readonly PersonAccessDataClient      _personAccessDataClient     ; 
+    private          VisitorDataClient           _visitorDataClient          ;
+ 
 
   }
 }

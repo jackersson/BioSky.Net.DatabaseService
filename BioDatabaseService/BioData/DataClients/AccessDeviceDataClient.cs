@@ -22,88 +22,77 @@ namespace BioData.DataClients
       }
     }
 
-    public BioService.AccessDevice Add(Location existingLocation, BioService.AccessDevice item, BioSkyNetDataModel dataContext)
+    public BioService.AccessDevice Add(Location existingLocation, BioService.AccessDevice request, BioSkyNetDataModel dataContext)
     {
-      BioService.AccessDevice newProtoAccessDevice = new BioService.AccessDevice() { };
-      if (item == null)
-        return newProtoAccessDevice;
+      BioService.AccessDevice response = new BioService.AccessDevice() { EntityState = BioService.EntityState.Added, Dbresult = BioService.Result.Failed };
+      if (request == null || existingLocation == null)
+        return response;
 
       try
       {
-        AccessDevice existingAccessDevice = dataContext.AccessDevice.Where(x => x.PortName == item.Portname).FirstOrDefault();
+        AccessDevice existingDevice = dataContext.AccessDevice.Where(x => x.PortName == request.Portname).FirstOrDefault();
 
-        if ( existingAccessDevice == null )
-           existingAccessDevice = _convertor.GetAccessDeviceEntity(item);
+        if (existingDevice == null)
+          existingDevice = _convertor.GetAccessDeviceEntity(request);
+        else        
+          existingDevice.Location.Clear();
 
-
-        if (existingLocation.AccessDevice.Count > 0)
-        {
-          BioService.RawIndexes items = new BioService.RawIndexes();
-          foreach (AccessDevice cp in existingLocation.AccessDevice)
-            items.Indexes.Add(cp.Id);
-
-          Remove(items);
-        }
-
-        existingLocation.AccessDevice.Add(existingAccessDevice);   
+        existingLocation.AccessDevice = existingDevice;   
 
         int affectedRows = dataContext.SaveChanges();
         if (affectedRows > 0)
-          newProtoAccessDevice.Id = existingAccessDevice.Id;
+          response.Dbresult = BioService.Result.Success;
       }
-      catch (Exception ex)
-      {
+      catch (Exception ex) {
         Console.WriteLine(ex.Message);
       }
 
-      return newProtoAccessDevice;
+      return response;
     }
 
-    public BioService.RawIndexes Remove(BioService.RawIndexes items)
+    public void Update(Location entity, BioService.AccessDevice request, BioService.Location response, BioSkyNetDataModel dataContext)
     {
-      using (var dataContext = _locator.GetProcessor<IContextFactory>().Create<BioSkyNetDataModel>())
-      {
-        return Remove(items, dataContext);
-      }
+      if (request == null)
+        return;
+
+      if (request.EntityState == BioService.EntityState.Added)      
+        response.AccessDevice = Add(entity, request, dataContext);      
+      else if (request.EntityState == BioService.EntityState.Deleted)
+        Remove(entity, response, dataContext);
     }
 
-    public BioService.RawIndexes Remove(BioService.RawIndexes items, BioSkyNetDataModel dataContext)
+    public void Remove (Location entity, BioService.Location response, BioSkyNetDataModel dataContext)
     {
-      BioService.RawIndexes removedItems = new BioService.RawIndexes();
-      if (items == null || items.Indexes.Count <= 0)
-        return removedItems;
+      bool hasResponse = response != null;
+      if (entity == null)
+        return;
 
+      if (hasResponse)
+        response.AccessDevice = new BioService.AccessDevice() { EntityState = BioService.EntityState.Deleted, Dbresult = BioService.Result.Failed };
       try
       {
-        var existingItems = dataContext.CaptureDevice.Where(x => items.Indexes.Contains(x.Id));
+        AccessDevice existingEntity = entity.AccessDevice;
 
-        if (existingItems == null)
-          return removedItems;
-
-        foreach(CaptureDevice captureDevice in existingItems)        
-          captureDevice.Location_Id = null;        
-
-        var deletedItems = dataContext.CaptureDevice.RemoveRange(existingItems);
-        int affectedRows = dataContext.SaveChanges();
-        if (deletedItems.Count() == affectedRows)
-          return items;
-        else
+        if (existingEntity == null)
         {
-          foreach (long id in items.Indexes)
-          {
-            if (dataContext.CaptureDevice.Find(id) == null)
-              removedItems.Indexes.Add(id);
-          }
-        }
+          if (hasResponse)
+            response.AccessDevice.Dbresult = BioService.Result.Success;
+          return;
+        }           
+
+        dataContext.AccessDevice.Remove(existingEntity);
+        int affectedRows = dataContext.SaveChanges();
+        if (affectedRows <= 0)
+          return;
+
+        if (hasResponse)
+          response.AccessDevice.Dbresult = BioService.Result.Success;
       }
-      catch (Exception ex)
-      {
+      catch (Exception ex)  {
         Console.WriteLine(ex.Message);
       }
-
-      return removedItems;
     }
-
+   
     private IProcessorLocator _locator;
     private ProtoMessageConvertor _convertor;
   }

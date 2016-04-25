@@ -14,7 +14,7 @@ namespace BioData.DataModels
         {
             Card = new HashSet<Card>();
             PersonAccess = new HashSet<PersonAccess>();
-            PhotoCollection = new HashSet<Photo>();
+            Photos = new HashSet<Photo>();
             Visitor = new HashSet<Visitor>();
         }
 
@@ -41,8 +41,8 @@ namespace BioData.DataModels
         [StringLength(50)]
         public string City { get; set; }
 
-        [Column("Photo Id")]
-        public long? Photo_Id { get; set; }
+        [Column("Thumbnail Id")]
+        public long? Thumbnail_Id { get; set; }
 
         public string Comments { get; set; }
 
@@ -54,18 +54,23 @@ namespace BioData.DataModels
         [Column("Criminal Id")]
         public long? Criminal_Id { get; set; }
 
+        [Column("BiometricData Id")]
+        public long? BiometricData_Id { get; set; }
+
+        public virtual BiometricData BiometricData { get; set; }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Card> Card { get; set; }
 
         public virtual Criminal Criminal { get; set; }
 
-        public virtual Photo Photo { get; set; }
+        public virtual Photo Thumbnail { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PersonAccess> PersonAccess { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Photo> PhotoCollection { get; set; }
+        public virtual ICollection<Photo> Photos { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Visitor> Visitor { get; set; }

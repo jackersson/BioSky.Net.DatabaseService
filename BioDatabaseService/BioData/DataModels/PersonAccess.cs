@@ -9,12 +9,6 @@ namespace BioData.DataModels
     [Table("PersonAccess")]
     public partial class PersonAccess
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public PersonAccess()
-        {
-            LocationCollection = new HashSet<Location>();
-        }
-
         public long Id { get; set; }
 
         [Column("Location Id")]
@@ -22,9 +16,6 @@ namespace BioData.DataModels
 
         [Column("Person Id")]
         public long Person_Id { get; set; }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Location> LocationCollection { get; set; }
 
         public virtual Location Location { get; set; }
 
